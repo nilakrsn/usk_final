@@ -7,26 +7,7 @@ import { TextInput } from "react-native";
 import axios from "axios";
 
 const TopUp = ({ navigation }) => {
-  const [creditTopUp, setCreditTopUp] = useState("");
-
-  const handleTopUp = async () => {
-    try {
-      const token = await AsyncStorage.getItem("token");
-      await axios.post(`${API_URL}topup`,{
-        credit: creditTopUp
-        
-      }, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      setCreditTopUp("");
-      Alert.alert("Top Up successfully, please wait");
-      navigation.navigate("MainUser");
-    } catch (e) {
-      console.log(e);
-    }
-  };
+  
 
   const textInputStyle =
     "tracking-widest border p-3 py-3 text-base border-slate-900 rounded-lg w-full";

@@ -16,58 +16,7 @@ import axios from "axios";
 import { API_URL } from "../constantAPI";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 const CreateProduct = ({ navigation }) => {
-  const [nameProduct, setnameProduct] = useState("");
-  const [priceProduct, setpriceProduct] = useState("");
-  const [stockProduct, setstockProduct] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState(0);
-  const [standProduct, setstandProduct] = useState("");
-  const [descProduct, setdescProduct] = useState("");
-  const [displayPhoto, setdisplayPhoto] = useState("");
-  const [categoryProduct, setDataCategory] = useState([]);
  
-  const createProduct = async () => {
-    try {
-      const token = await AsyncStorage.getItem("token");
-      await axios.post(`${API_URL}create-product-url`,{
-        name: nameProduct,
-        price: priceProduct,
-        stock: stockProduct,
-        photo: displayPhoto,
-        desc: descProduct,
-        categories_id: selectedCategory,
-        stand: standProduct,
-        
-      }, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      Alert.alert("Success create");
-      navigation.navigate("MainCanteen", { createProductCallBack: displayPhoto})
-    } catch (e) {
-      console.log(e);
-    }
-  }
-
-  
-  const getDataCategory = async () => {
-    try {
-      const token = await AsyncStorage.getItem("token");
-      const response = await axios.get(`${API_URL}categories`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-        setDataCategory(response.data.categories);
-    } catch (e) {
-      console.log(e);
-    }
-  }
- 
-  useEffect(()=>{
-    getDataCategory();
-  })
     
   const textInputStyle =
     "tracking-widest border p-3 py-3 text-base border-slate-900 rounded-lg w-full";

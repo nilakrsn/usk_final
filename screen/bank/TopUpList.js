@@ -12,39 +12,7 @@ import {
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 
 const TopUpList = ({ navigation }) => {
-  const [dataBank, setDataBank] = useState([]);
-  const [refreshing, setRefreshing] = useState(false);
-
-  const getDataBank = async () => {
-    const token = await AsyncStorage.getItem("token");
-    try {
-      const response = await axios.get(`${API_URL}bank`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      setDataBank(response.data);
-    } catch (e) {
-      console.log(e);
-    }
-  };
-  const formatDate = (timestamp) => {
-    const date = new Date(timestamp);
-    const options = { year: "numeric", month: "long", day: "numeric" };
-    return date.toLocaleDateString(undefined, options);
-  };
-
-  const onRefresh = () => {
-    setRefreshing(true);
-    getDataBank();
-    setTimeout(() => {
-      setRefreshing(false);
-    }, 2000);
-  };
-
-  useEffect(() => {
-    getDataBank();
-  }, []);
+  
 
   return (
     <GestureHandlerRootView>

@@ -7,54 +7,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { API_URL } from "../constantAPI";
 const OrderPage = ({navigation}) => {
-  const [transaction, setTransaction] = useState([]);
-  const [refreshing, setRefreshing ] = useState(true);
-
-  const getTransaction = async () =>{
-    try {
-      const token = await AsyncStorage.getItem("token");
-      const response = await axios.get(`${API_URL}transaction-kantin`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      setTransaction(response.data.transactions);
-    } catch (e) {
-      console.log(e);
-    }
-  }
-  const formatDate = (timestamp) => {
-    const date = new Date(timestamp);
-    const options = { year: "numeric", month: "long", day: "numeric" };
-    return date.toLocaleDateString(undefined, options);
-  };
-
-
-  const verifPengambilan = async (id)=>{
-    try {
-      const token = await AsyncStorage.getItem("token");
-     await axios.put(`${API_URL}transaction-kantin/${id}`,{}, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      getTransaction();
-      Alert.alert("Success Verif")
-    } catch (e) {
-      console.log(e);
-    }
-  }
  
-  useEffect(()=>{
-    getTransaction();
-  })
-  const onRefresh = async () => {
-    setRefreshing(true);
-    getTransaction();
-    setTimeout(() => {
-      setRefreshing(false);
-    }, 1000);
-  };
 
   return (
     <GestureHandlerRootView>
@@ -71,7 +24,7 @@ const OrderPage = ({navigation}) => {
             <View>
               <Text className="font-bold text-lg mb-2">History</Text>
             </View>
-            {transaction.map((item, index) => (
+            {transaction?.map((item, index) => (
               <View
                 className="bg-white flex flex-row justify-between w-full border border-slate-300 items-center align-middle rounded-lg p-3 mb-2"
                 key={index}

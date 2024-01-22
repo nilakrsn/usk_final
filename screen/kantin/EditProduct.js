@@ -18,76 +18,7 @@ import { API_URL } from "../constantAPI";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 
 const EditProduct = ({ navigation, route }) => {
-  const [nameProduct, setnameProduct] = useState("");
-  const [priceProduct, setpriceProduct] = useState("");
-  const [stockProduct, setstockProduct] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState(0);
-  const [standProduct, setstandProduct] = useState("");
-  const [descProduct, setdescProduct] = useState("");
-  const [displayPhoto, setdisplayPhoto] = useState("");
-  const [categoryProduct, setDataCategory] = useState([]);
-  const { id } = route.params;
-
-  const getDataEdit = async () => {
-    try{
-      const token = await AsyncStorage.getItem("token");
-    const response = await axios.get(`${API_URL}product-edit/${id}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    setnameProduct(response.data.products.name);
-    setdescProduct(response.data.products.desc);
-    setstandProduct(response.data.products.stand.toString());
-    setstockProduct(response.data.products.stock.toString());
-    setpriceProduct(response.data.products.price.toString());
-    setDataCategory(response.data.categories);
-    setdisplayPhoto(response.data.products.photo);
-    setSelectedCategory(response.data.products.categories_id);
-    }catch(e){
-      console.log
-    }
-  };
-  const editProduct = async () => {
-    try{
-      const token = await AsyncStorage.getItem("token");
-    await axios.put(
-      `${API_URL}product-update/${id}`,
-      {
-        name: nameProduct,
-        price: priceProduct,
-        stock: stockProduct,
-        photo: displayPhoto,
-        desc: descProduct,
-        categories_id: selectedCategory,
-        stand: standProduct,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    Alert.alert("Success Edit");
-    navigation.navigate("MainCanteen", {
-      editProductCallback: [
-        nameProduct,
-        priceProduct,
-        stockProduct,
-        displayPhoto,
-        descProduct,
-        selectedCategory,
-        standProduct,
-      ],
-    });
-    }catch(e){
-      console.log(e)
-    }
-  };
-
-  useEffect(() => {
-    getDataEdit();
-  }, []);
+  
 
   const textInputStyle =
     "tracking-widest border p-3 py-3 text-base border-slate-900 rounded-lg w-full";

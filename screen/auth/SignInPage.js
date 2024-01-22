@@ -5,29 +5,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { API_URL } from "../constantAPI";
 
 const SignInPage = ({ navigation }) => {
-  const [name, setName] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-
-  const SignUp = async () => {
-    try {
-      if (password !== confirmPassword) {
-        Alert.alert("Passwords do not match");
-        return;
-      }
-      const response = await axios.post(`${API_URL}register`, {
-        name: name,
-        password: password,
-      });
-      console.log(response.data);
-      setName("");
-      setPassword("");
-      setConfirmPassword("");
-      navigation.navigate("Login");
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  
   const textInputStyle =
     "tracking-widest border p-3 py-3 text-base border-slate-900 rounded-lg w-full";
 

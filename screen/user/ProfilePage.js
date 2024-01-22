@@ -20,75 +20,8 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 import { API_URL } from "../constantAPI";
 
 const ProfilePage = ({ navigation, route }) => {
-  const [walletSelesai, setWalletSelesai] = useState([]);
-  const [walletProcess, setWalletProcess] = useState([]);
-  const [historyBeli, setHistoryBeli] = useState([]);
-  const [refreshing, setRefresh] = useState(false);
-  const [dataSiswa, setDataSiswa] = useState([]);
-  const { successTopUp } = route.params || {};
-
-  const getDataHistory = async () => {
-    const token = await AsyncStorage.getItem("token");
-    const response = await axios.get(`${API_URL}history`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    console.log("response.data", response.data);
-    setWalletSelesai(response.data.walletSelesai);
-    setWalletProcess(response.data.walletProcess);
-    setHistoryBeli(response.data.transactionsBayar);
-  };
-
-  const getDataSiswa = async () => {
-    const token = await AsyncStorage.getItem("token");
-    const response = await axios.get(`${API_URL}getsiswa`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    setDataSiswa(response.data);
-  };
-
-  useEffect(() => {
-    getDataHistory();
-    getDataSiswa();
-    if (successTopUp) {
-      getDataSiswa();
-    }
-  }, [successTopUp]);
-
-  const onRefresh = async () => {
-    setRefresh(true);
-    await getDataHistory();
-    setTimeout(() => {
-      setRefresh(false);
-    }, 2000);
-  };
-
-  const logout = async () => {
-    try {
-      const token = await AsyncStorage.getItem("token");
-      await axios.post(
-        `${API_URL}logout`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      await AsyncStorage.multiRemove(["token", "role"]);
-      navigation.navigate("Login");
-    } catch (e) {
-      console.log(e);
-    }
-  };
-  const formatDate = (timestamp) => {
-    const date = new Date(timestamp);
-    const options = { year: "numeric", month: "long", day: "numeric" };
-    return date.toLocaleDateString(undefined, options);
-  };
+ 
+  
   return (
     <GestureHandlerRootView>
       <SafeAreaView className="bg-white w-full h-full">
@@ -142,7 +75,9 @@ const ProfilePage = ({ navigation, route }) => {
                   className="bg-white py-2 rounded-full px-6"
                   onPress={() => navigation.navigate("TopUp")}
                 >
-                  <Text className="text-black font-bold">Top Up</Text>
+                  <Text className="text-black font-bold text-center">
+                    Top Up
+                  </Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -229,5 +164,9 @@ const ProfilePage = ({ navigation, route }) => {
     </GestureHandlerRootView>
   );
 };
-
+// const formatDate = (timestamp) => {
+//   const date = new Date(timestamp);
+//   const options = { year: "numeric", month: "long", day: "numeric" };
+//   return date.toLocaleDateString(undefined, options);
+// };
 export default ProfilePage;

@@ -11,40 +11,16 @@ import MainCanteen from "./screen/kantin/MainCanteen";
 import MainBank from "./screen/bank/MainBank";
 import EditProduct from "./screen/kantin/EditProduct";
 import CreateProduct from "./screen/kantin/CreateProduct";
-import WithDraw from "./screen/bank/WithDraw";
+
 import TopUp from "./screen/user/TopUp";
 import CreateUser from "./screen/admin/user-proses/CreateUser";
 import EditUser from "./screen/admin/user-proses/EditUser";
 import EditCategory from "./screen/admin/category-proses/EditCategory";
 import CreateCategory from "./screen/admin/category-proses/CreateCategory";
+import WithDrawBank from "./screen/bank/WithDrawBank";
 
 const App = () => {
-  const Stack = createNativeStackNavigator();
-  const navigationRef = React.useRef();
-  const checkAuth = async () => {
-    const token = await AsyncStorage.getItem("token");
-    const role = await AsyncStorage.getItem("role");
-    if (token && role !== null) {
-      switch (role) {
-        case "admin":
-          navigationRef.current?.navigate("MainAdmin");
-          break;
-        case "bank":
-          navigationRef.current?.navigate("MainBank");
-          break;
-        case "kantin":
-          navigationRef.current?.navigate("MainCanteen");
-          break;
-        default:
-          navigationRef.current?.navigate("MainUser");
-          break;
-      }
-    }
-  };
-
-  React.useEffect(() => {
-    checkAuth();
-  }, []);
+  
 
   return (
     <PaperProvider>
@@ -97,7 +73,8 @@ const App = () => {
           />
 
           {/*BANK*/}
-          <Stack.Screen name="WithDraw" component={WithDraw} />
+         
+          <Stack.Screen name="WithDrawBank" component={WithDrawBank} />
 
           {/*USER*/}
           <Stack.Screen name="TopUp" component={TopUp} />

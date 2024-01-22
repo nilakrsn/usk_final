@@ -21,63 +21,7 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 import { API_URL } from "../constantAPI";
 
 const HomeUser = ({ navigation, route }) => {
-  const [data, setData] = useState([]);
-  const [refreshing, setRefresh] = useState(false);
-  const { getDataSiswaCallBack } = route.params || {};
-  const { username } = route.params || {};
-  const [roleAuth, setRoleAuth] = useState("");
-  const [name, setName] = useState("");
-
-  const getDataSiswa = async () => {
-    const token = await AsyncStorage.getItem("token");
-    const role = await AsyncStorage.getItem("role");
-    const name = await AsyncStorage.getItem("name");
-    const response = await axios.get(`${API_URL}get-product-siswa`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    console.log("response.data", response.data);
-    setData(response.data);
-    setRoleAuth(role);
-    setName(name);
-  };
-
-  useEffect(() => {
-    getDataSiswa();
-
-    console.log(getDataSiswaCallBack);
-    if (getDataSiswaCallBack) {
-      getDataSiswa();
-    }
-  }, [getDataSiswaCallBack]);
-
-  const onRefresh = async () => {
-    setRefresh(true);
-    await getDataSiswa();
-    setTimeout(() => {
-      setRefresh(false);
-    }, 2000);
-  };
-
-  const logout = async () => {
-    try {
-      const token = await AsyncStorage.getItem("token");
-      await axios.post(
-        `${API_URL}logout`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      await AsyncStorage.multiRemove(["token", "role"]);
-      navigation.navigate("Login");
-    } catch (e) {
-      console.log(e);
-    }
-  };
+  
   return (
     <GestureHandlerRootView>
       <SafeAreaView className="bg-white w-full h-full">
@@ -132,7 +76,9 @@ const HomeUser = ({ navigation, route }) => {
                   className="bg-white py-2 rounded-full px-6"
                   onPress={() => navigation.navigate("TopUp")}
                 >
-                  <Text className="text-black font-bold">Top Up</Text>
+                  <Text className="text-black font-bold text-center">
+                    Top Up
+                  </Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -142,19 +88,18 @@ const HomeUser = ({ navigation, route }) => {
               <Text className="font-bold text-lg mb-2">History</Text>
             </View>
             {data.products?.map((item, index) => (
-                <CardProduct
-                  key={index}
-                  name={item.name}
-                  photo={`${item.photo}`}
-                  price={item.price}
-                  role={roleAuth}
-                  stand={item.stand}
-                  stock={item.stock}
-                  id={item.id}
-                  navigation={navigation}
-                />
-              ))}
-
+              <CardProduct
+                key={index}
+                name={item.name}
+                photo={`${item.photo}`}
+                price={item.price}
+                role={roleAuth}
+                stand={item.stand}
+                stock={item.stock}
+                id={item.id}
+                navigation={navigation}
+              />
+            ))}
           </View>
         </ScrollView>
       </SafeAreaView>

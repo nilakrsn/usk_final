@@ -1,9 +1,12 @@
+// WithDrawBank component in React Native
+
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { API_URL } from "../constantAPI";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import {
+  Alert,
   SafeAreaView,
   ScrollView,
   Text,
@@ -11,51 +14,34 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { Picker } from "react-native-web";
+import { Picker } from "@react-native-picker/picker";
 
-const WithDraw = ({ navigation }) => {
-  const [withDraw, setWithDraw] = useState("");
-  const [selectedUser, setSelectedUser] = useState(0);
-  const [dataUser, setDataUser] = useState([]);
-
-  const getDataUser = async () => {
-    const token = await AsyncStorage.getItem("token");
-    try {
-      const response = await axios.get(`${API_URL}bank`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      setDataUser(response.data);
-    } catch (e) {
-      console.log(e);
-    }
-  };
-  const WithDrawBank = async () => {
-    const token = await AsyncStorage.getItem("token");
-    await axios.post(
-      `${API_URL}withdraw`,
-      {
-        debit: withDraw,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    setWithDraw("");
-    Alert.alert("WithDraw Success");
-    navigation.navigate("MainBank");
-  };
-  
+const WithDrawBank = ({ navigation }) => {
+ 
   const textInputStyle =
     "tracking-widest border p-3 py-3 text-base border-slate-900 rounded-lg w-full";
   return (
     <GestureHandlerRootView>
       <SafeAreaView className="bg-white w-full h-full">
         <View className="p-3">
-         
+          <View className="p-3">
+            <Text className="text-md py-2">Select Nasabah</Text>
+            <Picker
+              className={`${textInputStyle}`}
+              selectedValue={selectedUser}
+              onValueChange={(item) => setSelectedUser(item)}
+            >
+              {dataSiswa && dataSiswa.siswa
+                ? dataSiswa.siswa.map((siswa, index) => (
+                    <Picker.Item
+                      key={index}
+                      label={siswa.name}
+                      value={siswa.id}
+                    />
+                  ))
+                : null}
+            </Picker>
+          </View>
           <View>
             <Text className="text-md py-2">Balance</Text>
             <TextInput
@@ -65,7 +51,7 @@ const WithDraw = ({ navigation }) => {
               onChangeText={(text) => setWithDraw(text)}
             />
           </View>
-          
+
           <View className="mt-3">
             <TouchableOpacity
               className="bg-slate-900 p-4 rounded-lg"
@@ -76,11 +62,10 @@ const WithDraw = ({ navigation }) => {
               </Text>
             </TouchableOpacity>
           </View>
-          
         </View>
       </SafeAreaView>
     </GestureHandlerRootView>
   );
 };
 
-export default WithDraw;
+export default WithDrawBank;

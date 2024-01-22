@@ -9,45 +9,7 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 import { API_URL } from "../../constantAPI";
 
 const EditUser = ({ navigation, route }) => {
-  const [name, setName] = useState("");
-  const [password, setPassword] = useState("");
-  const [selectedRole, setSelectedRole] = useState(0);
-  const [roleUser, setRoleUser] = useState([]);
-  const currentTime = new Date();
-  const seconds = currentTime.getSeconds();
-  const {id} = route.params ;
-
-  const getUserandRole = async () => {
-    const token = await AsyncStorage.getItem("token");
-    const response = await axios.get(`${API_URL}user-admin-edit/${id}`,{
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    });
-    setRoleUser(response.data.roles);
-    setName(response.data.user.name);
-    setSelectedRole(response.data.user.roles_id);
-  }
-
-  const editUser = async () => {
-    const token = await AsyncStorage.getItem("token");
-    await axios.put(`${API_URL}user-admin-update/${id}`,{
-      name: name,
-      password: password,
-      roles_id: selectedRole
-    },{
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    });
-    Alert.alert("Success Edit");
-    navigation.navigate("MainAdmin", {editUserCallback: seconds});
-    
-  }
-
-  useEffect(()=>{
-    getUserandRole();
-  },[]);
+ 
 
   const textInputStyle =
     "tracking-widest border p-3 py-3 text-base border-slate-900 rounded-lg w-full";

@@ -14,21 +14,7 @@ import axios from "axios";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { API_URL } from "../../constantAPI";
 const CreateCategory = ({ navigation }) => {
-  const [name, setName] = useState("");
- 
-  const createCategory = async () => {
-    const token = await AsyncStorage.getItem("token");
-    await axios.post(`${API_URL}category-admin-store`,{
-      name: name,
-    },{
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    });
-    Alert.alert("Success Create");
-    navigation.navigate("MainAdmin", {createCategoryCallback: name});
-    
-  }
+  
 
   const textInputStyle =
     "tracking-widest border p-3 py-3 text-base border-slate-900 rounded-lg w-full";

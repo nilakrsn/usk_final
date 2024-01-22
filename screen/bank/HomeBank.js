@@ -12,69 +12,7 @@ import {
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 
 const HomeBank = ({ navigation }) => {
-  const [dataBank, setDataBank] = useState([]);
-  const [refreshing, setRefreshing] = useState(false);
-
-  const getDataBank = async () => {
-    const token = await AsyncStorage.getItem("token");
-    try {
-      const response = await axios.get(`${API_URL}bank`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      setDataBank(response.data);
-    } catch (e) {
-      console.log(e);
-    }
-  };
-
-  const acceptTopUp = async (id) => {
-    const token = await AsyncStorage.getItem("token");
-    await axios.put(`${API_URL}topup-success/${id}`,{},{
-      headers: {
-        Authorization: `Bearer ${token}`,
-      }
-    })
-  }
-
   
-  const logout = async () => {
-    try {
-      const token = await AsyncStorage.getItem("token");
-      await axios.post(
-        `${API_URL}logout`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      await AsyncStorage.multiRemove(["token", "role"]);
-      navigation.navigate("Login");
-    } catch (e) {
-      console.log(e);
-    }
-  };
-
-  const formatDate = (timestamp) => {
-    const date = new Date(timestamp);
-    const options = { year: "numeric", month: "long", day: "numeric" };
-    return date.toLocaleDateString(undefined, options);
-  };
-
-  const onRefresh = () => {
-    setRefreshing(true);
-    getDataBank();
-    setTimeout(() => {
-      setRefreshing(false);
-    }, 2000);
-  };
-
-  useEffect(() => {
-    getDataBank();
-  }, []);
 
   return (
     <GestureHandlerRootView>
@@ -124,20 +62,7 @@ const HomeBank = ({ navigation }) => {
                   <Text className="font-bold text-lg">Balance Total</Text>
                   <Text className="text-lg">{dataBank.balanceBank}</Text>
                 </View>
-                <View className="ml-2">
-                  <TouchableOpacity
-                    className="gap-0 bg-slate-900 p-1.5 rounded-lg"
-                    onPress={() => {
-                      navigation.navigate("WithDraw");
-                    }}
-                  >
-                    <MaterialCommunityIcons
-                      name="cash-refund"
-                      color="white"
-                      size={24}
-                    />
-                  </TouchableOpacity>
-                </View>
+                
               </View>
               <View className="bg-white flex-1 p-4 py-3 border border-slate-300 rounded-lg">
                 <View className="gap-0">
@@ -145,6 +70,16 @@ const HomeBank = ({ navigation }) => {
                   <Text className="text-lg">{dataBank.nasabah}</Text>
                 </View>
               </View>
+              <View>
+                  <TouchableOpacity
+                    className="bg-white py-2 rounded-full px-6"
+                    onPress={() => {
+                      navigation.navigate("WithDrawBank");
+                    }}
+                  >
+                    <Text className="text-black font-bold">WithDraw</Text>
+                  </TouchableOpacity>
+                </View>
             </View>
 
             <View>

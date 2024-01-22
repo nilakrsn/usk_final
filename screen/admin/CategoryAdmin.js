@@ -12,40 +12,7 @@ import {
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 
 const CategoryAdmin = ({ navigation, route }) => {
-  const [dataCategory, setDataCategory] = useState([]);
-  const [refreshing, setRefreshing] = useState(false);
-
-  const getDataCategory = async() => {
-    const token = await AsyncStorage.getItem("token");
-    const response = await axios.get(`${API_URL}category-admin`,{
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    });
-    setDataCategory(response.data.categories);
-  }
-
-  const deleteCategory = async (id) => {
-    const token = await AsyncStorage.getItem("token");
-    await axios.delete(`${API_URL}category-admin-delete/${id}`,{
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    });
-    Alert.alert("Success delete");
-  }
-
-  useEffect(() => {
-    getDataCategory();
-  }, []);
-
-  const onRefresh = () => {
-    setRefreshing(true);
-    getDataCategory();
-    setTimeout(() => {
-      setRefreshing(false);
-    }, 2000);
-  };
+  
 
   return (
     <GestureHandlerRootView>

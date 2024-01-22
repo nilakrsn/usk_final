@@ -11,36 +11,7 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 import { API_URL } from "../constantAPI";
 
 const HistoryAdmin = ({ route }) => {
-  const [report, setReport] = useState([]);
-  const { successTopUp } = route.params || {};
-  const [refreshing, setRefreshing] = useState(false);
-
-  const getDataHistory = async () => {
-    const token = await AsyncStorage.getItem("token");
-    const response = await axios.get(`${API_URL}report/all`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    setReport(response.data);
-  };
-  useEffect(() => {
-    getDataHistory();
-  }, [successTopUp]);
-
-  const onRefresh = () => {
-    setRefreshing(true);
-    getDataHistory();
-    setTimeout(() => {
-      setRefreshing(false);
-    }, 2000);
-  };
-  const formatDate = (timestamp) => {
-    const date = new Date(timestamp);
-    const options = { year: "numeric", month: "long", day: "numeric" };
-    return date.toLocaleDateString(undefined, options);
-  };
-
+  
   return (
     <GestureHandlerRootView>
       <SafeAreaView className="bg-white w-full h-full">
