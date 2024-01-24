@@ -3,27 +3,78 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import {
   Alert,
-  FlatList,
   Image,
   ScrollView,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
-import { GestureHandlerRootView, RefreshControl } from "react-native-gesture-handler";
+import {
+  GestureHandlerRootView,
+  RefreshControl,
+} from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { API_URL } from "../constantAPI";
+
 const ProductCanteen = ({ navigation, route }) => {
-  
+  const [dataProduk, setDataProduk] = useState([]);
+  const [refresh, setRefresh] = useState(false);
+  const { createProductCallBack, editProductCallBack } = route.params || {};
+
+  const getDataProduct = async () => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      const response = await axios.get(`${API_URL}kantin`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setDataProduk(response.data);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const deleteProduct = async (id) => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      await axios.delete(`${API_URL}delete-product-url/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      Alert.alert("Success delete data");
+      getDataProduct();
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const onRefresh = async () => {
+    setRefresh(true);
+    getDataProduct();
+    setTimeout(() => {
+      setRefresh(false);
+    }, 2000);
+  };
+
+  useEffect(() => {
+    getDataProduct();
+    if (createProductCallBack || editProductCallBack) {
+      getDataProduct();
+    }
+  }, [createProductCallBack, editProductCallBack]);
 
   return (
     <GestureHandlerRootView>
       <SafeAreaView className="bg-white w-full h-full">
-        <ScrollView refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-          }>
-          <View className=" w-full p-3 py-4 border-b border-slate-300 flex flex-row justify-between items-center bg-white ">
+        <ScrollView
+          refreshControl={
+            <RefreshControl refreshing={refresh} onRefresh={onRefresh} />
+          }
+        >
+          <View className=" w-full p-3 py-4 border-slate-300 flex flex-row justify-between items-center bg-white ">
             <View>
               <Text className="font-bold text-lg">Product Canteen</Text>
             </View>
@@ -37,7 +88,10 @@ const ProductCanteen = ({ navigation, route }) => {
           </View>
           <View>
             {dataProduk.products?.map((item, index) => (
-              <View key={index} className="flex p-3 border border-slate-300 bg-white">
+              <View
+                key={index}
+                className="flex p-3 border border-slate-300 bg-white"
+              >
                 <View className="flex justify-between flex-row">
                   <View className="flex-row flex">
                     <View className="bg-slate-900 rounded-lg mr-3 basis-auto">
@@ -56,7 +110,7 @@ const ProductCanteen = ({ navigation, route }) => {
                           </Text>
                         </View>
                         <Text className="font-base text-base text-slate-800 -mt-1">
-                          {item.price}
+                          Rp{item.price}
                         </Text>
                       </View>
                       <View className="flex ">
@@ -69,6 +123,7 @@ const ProductCanteen = ({ navigation, route }) => {
                   <View className="flex flex-row gap-3 justify-end items-center">
                     <View>
                       <TouchableOpacity
+                        className="bg-stone-700 p-1 rounded-md"
                         onPress={() => {
                           Alert.alert(
                             "Delete",
@@ -89,19 +144,22 @@ const ProductCanteen = ({ navigation, route }) => {
                       >
                         <MaterialCommunityIcons
                           name="trash-can-outline"
-                          size={24}
+                          size={20}
+                          color="white"
                         />
                       </TouchableOpacity>
                     </View>
                     <View>
                       <TouchableOpacity
+                        className="bg-stone-700 p-1 rounded-md"
                         onPress={() =>
                           navigation.navigate("EditProduct", { id: item.id })
                         }
                       >
                         <MaterialCommunityIcons
                           name="pencil-outline"
-                          size={24}
+                          size={20}
+                          color="white"
                         />
                       </TouchableOpacity>
                     </View>

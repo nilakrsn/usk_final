@@ -3,7 +3,7 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { API_URL } from "../constantAPI";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { View, Text, TouchableOpacity, Alert } from "react-native";
+import { View, Text, TouchableOpacity, Alert, FlatList } from "react-native";
 import {
   GestureHandlerRootView,
   RefreshControl,
@@ -13,7 +13,7 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 
 const HomeBank = ({ navigation }) => {
   const [dataBank, setDataBank] = useState([]);
-  const [refresh, setRefresh] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   const getDataBank = async () => {
     const token = await AsyncStorage.getItem("token");
@@ -31,19 +31,14 @@ const HomeBank = ({ navigation }) => {
 
   const acceptTopUp = async (id) => {
     const token = await AsyncStorage.getItem("token");
-    await axios.put(
-      `${API_URL}topup-success/${id}`,
-      {},
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+    await axios.put(`${API_URL}topup-success/${id}`,{},{
+      headers: {
+        Authorization: `Bearer ${token}`,
       }
-    );
-    Alert.alert("Confirm success");
-    getDataBank();
-  };
+    })
+  }
 
+  
   const logout = async () => {
     try {
       const token = await AsyncStorage.getItem("token");
@@ -70,10 +65,10 @@ const HomeBank = ({ navigation }) => {
   };
 
   const onRefresh = () => {
-    setRefresh(true);
+    setRefreshing(true);
     getDataBank();
     setTimeout(() => {
-      setRefresh(false);
+      setRefreshing(false);
     }, 2000);
   };
 
@@ -84,11 +79,9 @@ const HomeBank = ({ navigation }) => {
   return (
     <GestureHandlerRootView>
       <SafeAreaView className="bg-white w-full h-full">
-        <ScrollView
-          refreshControl={
-            <RefreshControl refreshing={refresh} onRefresh={onRefresh} />
-          }
-        >
+        <ScrollView refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }>
           <View className=" w-full p-3 py-4 border-b border-slate-300 flex flex-row justify-between items-center bg-white ">
             <View>
               <Text className="font-bold text-lg">Bank</Text>
@@ -126,26 +119,24 @@ const HomeBank = ({ navigation }) => {
           </View>
           <View className="py-0 flex p-3 justify-between">
             <View className="flex flex-row gap-3 py-2 justify-between mb-3">
-              <View className="bg-white flex-1 flex-row items-center justify-center p-5 py-3 border border-slate-300 rounded-lg">
-                <View className=" flex flex-row items-center gap-2">
-                  <View>
-                    <Text className="font-bold text-lg">Balance Total</Text>
-                    <Text className="text-lg">Rp{dataBank.balanceBank}</Text>
-                  </View>
-                  <View>
-                    <TouchableOpacity
-                      className="bg-stone-700 p-1 rounded-md"
-                      onPress={() => {
-                        navigation.navigate("WithDrawBank");
-                      }}
-                    >
-                      <MaterialCommunityIcons
-                        name="wallet-plus"
-                        color="#ffffff"
-                        size={20}
-                      />
-                    </TouchableOpacity>
-                  </View>
+              <View className="bg-white flex-1 flex-row items-center p-4 py-3 border border-slate-300 rounded-lg">
+                <View className="gap-0">
+                  <Text className="font-bold text-lg">Balance Total</Text>
+                  <Text className="text-lg">{dataBank.balanceBank}</Text>
+                </View>
+                <View className="ml-2">
+                  <TouchableOpacity
+                    className="gap-0 bg-slate-900 p-1.5 rounded-lg"
+                    onPress={() => {
+                      navigation.navigate("WithDraw");
+                    }}
+                  >
+                    <MaterialCommunityIcons
+                      name="cash-refund"
+                      color="white"
+                      size={24}
+                    />
+                  </TouchableOpacity>
                 </View>
               </View>
               <View className="bg-white flex-1 p-4 py-3 border border-slate-300 rounded-lg">
@@ -160,28 +151,16 @@ const HomeBank = ({ navigation }) => {
               <Text className="font-bold text-lg mb-2">History</Text>
             </View>
             {dataBank.wallets?.map((item, index) => (
-              <View
-                key={index}
-                className="border mb-2 border-slate-300 p-4 rounded-lg flex flex-row justify-between items-center"
-              >
+              <View key={index} className="border mb-2 border-slate-300 p-4 rounded-lg flex flex-row justify-between items-center">
                 <View className="flex flex-row items-center">
                   <View className="gap-0">
-                    <Text className="text-base font-bold">
-                      {item.user.name}
-                    </Text>
-                    <Text className="text-md">
-                      {formatDate(item.created_at)}
-                    </Text>
+                    <Text className="text-base font-bold">{item.user.name}</Text>
+                    <Text className="text-md">{formatDate(item.created_at)}</Text>
                     <View className="flex flex-row">
-                      {item.credit || 0 && item.debit || 0 ? (
-                        <Text className="text-md">
-                          Credit: Rp{item.credit || 0}
-                        </Text>
-                      ) : (
-                        <Text className="text-md">
-                          Debit: Rp{item.debit || 0}
-                        </Text>
-                      )}
+                      <Text className="text-md">Credit: Rp{item.credit || 0} |</Text>
+                      <Text className="text-md ml-2">
+                        Debit: Rp{item.debit || 0}
+                      </Text>
                     </View>
                   </View>
                 </View>
@@ -195,17 +174,19 @@ const HomeBank = ({ navigation }) => {
                   >
                     {item.status}
                   </Text>
-                  {item.status === "process" && (
-                    <TouchableOpacity
-                      className="p-1 rounded-full bg-stone-700 ml-3"
-                      onPress={() => acceptTopUp(item.id)}
-                    >
-                      <MaterialCommunityIcons
-                        name="check"
-                        color="white"
-                        size={20}
-                      />
-                    </TouchableOpacity>
+                  {
+                  item.status === 'process' && (
+
+                  <TouchableOpacity
+                    className="p-1 rounded-full bg-slate-900 ml-3"
+                    onPress={() => acceptTopUp(item.id)}
+                  >
+                    <MaterialCommunityIcons
+                      name="check"
+                      color="white"
+                      size={20}
+                    />
+                  </TouchableOpacity>
                   )}
                 </View>
               </View>
@@ -216,5 +197,6 @@ const HomeBank = ({ navigation }) => {
     </GestureHandlerRootView>
   );
 };
+
 
 export default HomeBank;

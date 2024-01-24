@@ -1,5 +1,3 @@
-// WithDrawBank component in React Native
-
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
@@ -8,7 +6,6 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import {
   Alert,
   SafeAreaView,
-  ScrollView,
   Text,
   TextInput,
   TouchableOpacity,
@@ -17,6 +14,45 @@ import {
 import { Picker } from "@react-native-picker/picker";
 
 const WithDrawBank = ({ navigation }) => {
+  const [dataSiswa, setDataSiswa] = useState([]);
+  const [withDraw, setWithDraw] = useState("");
+  const [selectedUser, setSelectedUser] = useState(0);
+
+  const getdataSiswa = async ()=> {
+    try{
+      const token = await AsyncStorage.getItem("token");
+      const response = await axios.get(`${API_URL}bank`,{
+        headers:{
+          Authorization: `Bearer ${token}`
+        }
+      });
+      setDataSiswa(response.data);
+    }catch(e){
+      console.log(e);
+    }
+  }
+
+  const WithDrawBank = async() => {
+    try{
+      const token = await AsyncStorage.getItem("token");
+     await axios.post(`${API_URL}withdraw`,{
+      users_id: selectedUser,
+      debit: withDraw
+     },{
+        headers:{
+          Authorization: `Bearer ${token}`
+        }
+      });
+      Alert.alert("Withdraw Success");
+      navigation.navigate("MainBank");
+      
+    }catch(e){
+      console.log(e);
+    }
+  }
+  useEffect(()=>{
+    getdataSiswa();
+  },[])
  
   const textInputStyle =
     "tracking-widest border p-3 py-3 text-base border-slate-900 rounded-lg w-full";
@@ -27,7 +63,6 @@ const WithDrawBank = ({ navigation }) => {
           <View className="p-3">
             <Text className="text-md py-2">Select Nasabah</Text>
             <Picker
-              className={`${textInputStyle}`}
               selectedValue={selectedUser}
               onValueChange={(item) => setSelectedUser(item)}
             >
@@ -54,7 +89,7 @@ const WithDrawBank = ({ navigation }) => {
 
           <View className="mt-3">
             <TouchableOpacity
-              className="bg-slate-900 p-4 rounded-lg"
+              className="bg-stone-700 p-4 rounded-lg"
               onPress={WithDrawBank}
             >
               <Text className="text-base text-white font-bold text-center">

@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {
   Alert,
-  Image,
   ScrollView,
   Text,
   TextInput,
@@ -11,14 +10,97 @@ import {
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Picker } from "@react-native-picker/picker";
-import * as ImagePicker from "expo-image-picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { API_URL } from "../constantAPI";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 
 const EditProduct = ({ navigation, route }) => {
-  
+  const [nameProduct, setnameProduct] = useState("");
+  const [priceProduct, setpriceProduct] = useState("");
+  const [stockProduct, setstockProduct] = useState("");
+  const [standProduct, setstandProduct] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState(0); 
+  const [displayPhoto, setdisplayPhoto] = useState("");
+  const [descProduct, setdescProduct] = useState("");
+  const [categoryProduct, setCategoryProduct] = useState([]);
+  const { id } = route.params;
+
+  const getCategory = async () => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      const response = await axios.get(`${API_URL}categories`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setCategoryProduct(response.data.categories);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+  const getData = async () => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      const response = await axios.get(`${API_URL}product-edit/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setnameProduct(response.data.products.name);
+      setpriceProduct(response.data.products.price.toString());
+      setstockProduct(response.data.products.stock.toString());
+      setdisplayPhoto(response.data.products.photo);
+      setdescProduct(response.data.products.desc);
+      setSelectedCategory(response.data.categories);
+      setstandProduct(response.data.products.stand.toString());
+      setSelectedCategory(response.data.products.categories_id);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const editProduct = async () => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      await axios.put(
+        `${API_URL}product-update-url/${id}`,
+        {
+          name: nameProduct,
+          price: priceProduct,
+          stock: stockProduct,
+          photo: displayPhoto,
+          desc: descProduct,
+          categories_id: selectedCategory,
+          stand: standProduct,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      Alert.alert("Success edit");
+      navigation.navigate("MainCanteen", {
+        editProductCallBack: [
+          nameProduct,
+          priceProduct,
+          stockProduct,
+          displayPhoto,
+          descProduct,
+          selectedCategory,
+          standProduct,
+        ],
+      });
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  useEffect(() => {
+    getData();
+    getCategory();
+  }, []);
 
   const textInputStyle =
     "tracking-widest border p-3 py-3 text-base border-slate-900 rounded-lg w-full";
@@ -112,7 +194,7 @@ const EditProduct = ({ navigation, route }) => {
             </View>
             <View>
               <TouchableOpacity
-                className="bg-slate-900 p-4 rounded-lg"
+                className="bg-stone-700 p-4 rounded-lg"
                 onPress={editProduct}
               >
                 <Text className="text-base text-white font-bold text-center">

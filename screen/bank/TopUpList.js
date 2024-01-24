@@ -3,7 +3,7 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { API_URL } from "../constantAPI";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { View, Text, TouchableOpacity, Alert, FlatList } from "react-native";
+import { View, Text, TouchableOpacity } from "react-native";
 import {
   GestureHandlerRootView,
   RefreshControl,
@@ -11,15 +11,49 @@ import {
 } from "react-native-gesture-handler";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 
-const TopUpList = ({ navigation }) => {
-  
+const TopUpList = () => {
+  const [dataBank, setDataBank] = useState([]);
+  const [refresh, setRefresh] = useState(false);
 
+  const getDataBank = async () => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      const response = await axios.get(`${API_URL}bank`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setDataBank(response.data);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const onRefresh = () => {
+    setRefresh(true);
+    getDataBank();
+    setTimeout(() => {
+      setRefresh(false);
+    }, 2000);
+  };
+
+  useEffect(() => {
+    getDataBank();
+  },[]);
+
+  const formatDate = (timestamp) => {
+    const date = new Date(timestamp);
+    const options = { year: "numeric", month: "long", day: "numeric" };
+    return date.toLocaleDateString(undefined, options);
+  };
   return (
     <GestureHandlerRootView>
       <SafeAreaView className="bg-white w-full h-full">
-        <ScrollView refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        } >
+        <ScrollView
+          refreshControl={
+            <RefreshControl refreshing={refresh} onRefresh={onRefresh} />
+          }
+        >
           <View className=" w-full p-3 py-4 border-b border-slate-300 flex flex-row justify-between items-center bg-white ">
             <View>
               <Text className="font-bold text-lg">Top Up List</Text>
@@ -31,7 +65,10 @@ const TopUpList = ({ navigation }) => {
             </View>
             <View>
               {dataBank.wallets?.map((item, index) => (
-                <View key={index} className="border-b border-slate-300 p-3 rounded-lg flex flex-row justify-between items-center">
+                <View
+                  key={index}
+                  className="border mb-2 border-slate-300 p-4 rounded-lg flex flex-row justify-between items-center"
+                >
                   <View className="flex flex-row items-center">
                     <View className="gap-0">
                       <Text className="text-base font-bold">
@@ -41,16 +78,19 @@ const TopUpList = ({ navigation }) => {
                         {formatDate(item.created_at)}
                       </Text>
                       <View className="flex flex-row">
-                        <Text className="text-md">
-                          Credit: Rp{item.credit || 0} |
-                        </Text>
-                        <Text className="text-md ml-2">
-                          Debit: Rp{item.debit || 0}
-                        </Text>
+                        {item.credit || 0 && item.debit || 0 ? (
+                          <Text className="text-md">
+                            Credit: Rp{item.credit || 0}
+                          </Text>
+                        ) : (
+                          <Text className="text-md">
+                            Debit: Rp{item.debit || 0}
+                          </Text>
+                        )}
                       </View>
                     </View>
                   </View>
-                  <View>
+                  <View className="flex flex-row justify-between">
                     <Text
                       className={`font-bold text-lg ${
                         item.status === "selesai"
@@ -60,11 +100,9 @@ const TopUpList = ({ navigation }) => {
                     >
                       {item.status}
                     </Text>
-                  </View>
-                  <View>
                     {item.status === "process" && (
                       <TouchableOpacity
-                        className="p-1 rounded-full bg-slate-900"
+                        className="p-1 rounded-full bg-stone-700 ml-3"
                         onPress={() => acceptTopUp(item.id)}
                       >
                         <MaterialCommunityIcons

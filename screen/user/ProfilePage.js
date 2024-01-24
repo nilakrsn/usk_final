@@ -20,14 +20,88 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 import { API_URL } from "../constantAPI";
 
 const ProfilePage = ({ navigation, route }) => {
- 
-  
+  const [walletSelesai, setWalletSelesai] = useState([]);
+  const [walletProcess, setWalletProcess] = useState([]);
+  const [historyBeli, setHistoryBeli] = useState([]);
+  const [dataSiswa, setDataSiswa] = useState([]);
+  const { successTopUp } = route.params || {};
+  const [refresh, setRefresh] = useState(false);
+
+  const getDataHistory = async () => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      const response = await axios.get(`${API_URL}history`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setWalletProcess(response.data.walletProcess);
+      setWalletSelesai(response.data.walletSelesai);
+      setHistoryBeli(response.data.transactionsBayar);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const getDataSiwa = async () => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      const response = await axios.get(`${API_URL}getsiswa`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setDataSiswa(response.data);
+      console.log(response.data);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+  const onRefresh = () => {
+    setRefresh(true);
+    getDataHistory();
+    getDataSiwa();
+    setTimeout(() => {
+      setRefresh(false);
+    }, 2000);
+  };
+
+  const logout = async () => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      await axios.post(
+        `${API_URL}logout`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      await AsyncStorage.multiRemove(["token", "role"]);
+      navigation.navigate("Login");
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const formatDate = (timestamp) => {
+    const date = new Date(timestamp);
+    const options = { year: "numeric", month: "long", day: "numeric" };
+    return date.toLocaleDateString(undefined, options);
+  };
+
+  useEffect(() => {
+    getDataHistory();
+    getDataSiwa();
+  }, []);
+
   return (
     <GestureHandlerRootView>
       <SafeAreaView className="bg-white w-full h-full">
         <ScrollView
           refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            <RefreshControl refreshing={refresh} onRefresh={onRefresh} />
           }
         >
           <View className=" w-full p-3 py-4 border-b border-slate-300 flex flex-row justify-between items-center bg-white ">
@@ -63,7 +137,7 @@ const ProfilePage = ({ navigation, route }) => {
             </View>
           </View>
           <View className="py-0 p-3">
-            <View className="bg-slate-900 p-4 rounded-lg flex flex-row justify-between items-center">
+            <View className="bg-stone-700 p-4 rounded-lg flex flex-row justify-between items-center">
               <View>
                 <Text className="text-white font-bold text-lg">Balance</Text>
                 <Text className="text-white text-base">
@@ -90,18 +164,16 @@ const ProfilePage = ({ navigation, route }) => {
                   <View
                     key={index}
                     className={
-                      item.credit === 0 || item.credit === null
+                      item.credit === 0 || item.credit === null 
                         ? `hidden`
                         : `flex flex-row justify-between items-center border border-slate-300 rounded-lg p-3 mb-3`
                     }
                   >
                     <View>
-                      <Text className="text-base font-bold">
-                        Rp{item.credit}
-                      </Text>
-                      <Text className="text-base">
+                      <Text className="text-base  font-bold">
                         {formatDate(item.created_at)}
                       </Text>
+                      <Text className="text-md">Rp{item.credit}</Text>
                     </View>
                     <Text className="text-base text-yellow-600 font-bold">
                       {item.status}
@@ -124,11 +196,9 @@ const ProfilePage = ({ navigation, route }) => {
                   >
                     <View>
                       <Text className="text-base font-bold">
-                        Rp{item.credit}
-                      </Text>
-                      <Text className="text-base">
                         {formatDate(item.created_at)}
                       </Text>
+                      <Text className="text-md ">Rp{item.credit}</Text>
                     </View>
                     <Text className="text-base text-green-700 font-bold">
                       {item.status}
@@ -137,36 +207,53 @@ const ProfilePage = ({ navigation, route }) => {
                 ))}
               </View>
             )}
-            <View>
-              <Text className="font-bold text-lg mb-2">
-                History Transaction
-              </Text>
-              {historyBeli?.map((item, index) => (
-                <View
-                  key={index}
-                  className={
-                    item.credit === 0 || item.credit === null
-                      ? `hidden`
-                      : `flex border border-slate-300 rounded-lg p-3 mb-3`
-                  }
-                >
-                  <Text className="text-base font-bold">{item.order_code}</Text>
-                  <Text className="text-base">{item.products.name}</Text>
-                  <Text className="text-base">
-                    {formatDate(item.created_at)}
-                  </Text>
-                </View>
-              ))}
-            </View>
+            {historyBeli &&
+              historyBeli.length >
+                0 && (
+                  <View>
+                    <Text className="font-bold text-lg mb-2">
+                      History Transaction
+                    </Text>
+                    {historyBeli?.map((item, index) => (
+                      <View
+                        key={index}
+                        className={
+                          item.credit === 0 || item.credit === null
+                            ? `hidden`
+                            : `flex border border-slate-300 rounded-lg p-3 mb-3 flex-row items-center justify-between`
+                        }
+                      >
+                        <View>
+                          <Text className="text-base font-bold">
+                            {item.order_code}
+                          </Text>
+                          <Text className="text-md">
+                            {formatDate(item.created_at)}
+                          </Text>
+                          <Text className="text-md">
+                            {item.products.name} | {item.quantity}x
+                          </Text>
+                        </View>
+                        <View>
+                          <Text
+                            className={
+                              item.status === "diambil"
+                                ? `font-bold text-slate-400`
+                                : `text-slate-900 font-bold`
+                            }
+                          >
+                            {item.status}
+                          </Text>
+                        </View>
+                      </View>
+                    ))}
+                  </View>
+                )}
           </View>
         </ScrollView>
       </SafeAreaView>
     </GestureHandlerRootView>
   );
 };
-// const formatDate = (timestamp) => {
-//   const date = new Date(timestamp);
-//   const options = { year: "numeric", month: "long", day: "numeric" };
-//   return date.toLocaleDateString(undefined, options);
-// };
+
 export default ProfilePage;

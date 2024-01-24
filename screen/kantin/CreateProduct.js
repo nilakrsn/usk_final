@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {
   Alert,
-  Image,
   ScrollView,
   Text,
   TextInput,
@@ -15,9 +14,63 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { API_URL } from "../constantAPI";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+
 const CreateProduct = ({ navigation }) => {
- 
-    
+  const [nameProduct, setnameProduct] = useState("");
+  const [priceProduct, setpriceProduct] = useState("");
+  const [stockProduct, setstockProduct] = useState("");
+  const [standProduct, setstandProduct] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState(0);
+  const [displayPhoto, setdisplayPhoto] = useState("");
+  const [descProduct, setdescProduct] = useState("");
+  const [categoryProduct, setCategoryProduct] = useState([]);
+
+  const getCategory = async () => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      const response = await axios.get(`${API_URL}categories`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setCategoryProduct(response.data.categories);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+  const createProduct = async () => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      await axios.post(
+        `${API_URL}create-product-url`,
+        {
+          name: nameProduct,
+          price: priceProduct,
+          stock: stockProduct,
+          photo: displayPhoto,
+          desc: descProduct,
+          categories_id: selectedCategory,
+          stand: standProduct,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      Alert.alert("Success create");
+      navigation.navigate("MainCanteen", {
+        createProductCallBack: displayPhoto,
+      });
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  useEffect(() => {
+    getCategory();
+  }, []);
+
   const textInputStyle =
     "tracking-widest border p-3 py-3 text-base border-slate-900 rounded-lg w-full";
 
@@ -111,7 +164,7 @@ const CreateProduct = ({ navigation }) => {
             </View>
             <View>
               <TouchableOpacity
-                className="bg-slate-900 p-4 rounded-lg"
+                className="bg-stone-700 p-4 rounded-lg"
                 onPress={createProduct}
               >
                 <Text className="text-base text-white font-bold text-center">

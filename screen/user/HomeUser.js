@@ -3,14 +3,12 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import {
   Alert,
-  FlatList,
   Image,
   ScrollView,
   Text,
   TextInput,
   TouchableOpacity,
   View,
-  VirtualizedList,
 } from "react-native";
 import { SafeAreaView } from "react-native";
 import {
@@ -21,13 +19,72 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 import { API_URL } from "../constantAPI";
 
 const HomeUser = ({ navigation, route }) => {
-  
+  const [data, setData] = useState([]);
+  const [roleAuth, setRoleAuth] = useState("");
+  const [name, setName] = useState("");
+  const [refresh, setRefresh] = useState(false);
+  const { username } = route.params || {};
+  const { getDataSiswaCallBack } = route.params || {};
+
+  const getData = async () => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      const role = await AsyncStorage.getItem("role");
+      const name = await AsyncStorage.getItem("name");
+      const response = await axios.get(`${API_URL}get-product-siswa`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      console.log(response.data);
+      setData(response.data);
+      setRoleAuth(role);
+      setName(name);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const onRefresh = () => {
+    setRefresh(true);
+    getData();
+    setTimeout(() => {
+      setRefresh(false);
+    }, 2000);
+  };
+
+  const logout = async () => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      await axios.post(
+        `${API_URL}logout`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      await AsyncStorage.multiRemove(["token", "role"]);
+      navigation.navigate("Login");
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  useEffect(() => {
+    getData();
+    if (getDataSiswaCallBack) {
+      getData();
+    }
+  }, [getDataSiswaCallBack]);
+
   return (
     <GestureHandlerRootView>
       <SafeAreaView className="bg-white w-full h-full">
         <ScrollView
           refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            <RefreshControl refreshing={refresh} onRefresh={onRefresh} />
           }
         >
           <View className=" w-full p-3 py-4 border-b border-slate-300 flex flex-row justify-between items-center bg-white ">
@@ -64,7 +121,7 @@ const HomeUser = ({ navigation, route }) => {
             </View>
           </View>
           <View className="py-0 p-3">
-            <View className="bg-slate-900 p-4 rounded-lg flex flex-row justify-between items-center">
+            <View className="bg-stone-700 p-4 rounded-lg flex flex-row justify-between items-center">
               <View>
                 <Text className="text-white font-bold text-lg">Balance</Text>
                 <Text className="text-white text-base">
@@ -85,7 +142,7 @@ const HomeUser = ({ navigation, route }) => {
           </View>
           <View className="py-0 flex p-3 justify-between">
             <View>
-              <Text className="font-bold text-lg mb-2">History</Text>
+              <Text className="font-bold text-lg mb-2">Data Product</Text>
             </View>
             {data.products?.map((item, index) => (
               <CardProduct
@@ -106,17 +163,7 @@ const HomeUser = ({ navigation, route }) => {
     </GestureHandlerRootView>
   );
 };
-const CardProduct = ({
-  id,
-  name,
-  photo,
-  stand,
-  stock,
-  price,
-  role,
-  navigation,
-  deleteProduct,
-}) => {
+const CardProduct = ({ id, name, photo, stock, price, navigation }) => {
   const [quantity, setquantity] = useState(1);
 
   const handleIncrease = () => {
@@ -168,7 +215,7 @@ const CardProduct = ({
     <View className="flex flex-row justify-between border border-slate-300 p-3 rounded-lg mb-2">
       <View className="flex flex-row gap-4">
         <View>
-          <View className="bg-slate-900 rounded-lg basis-auto">
+          <View className="bg-stone-700 rounded-lg basis-auto">
             <Image
               className="h-24 w-20 rounded-lg"
               source={{
@@ -184,7 +231,7 @@ const CardProduct = ({
             <View style={{ alignItems: "center" }} className="flex flex-row">
               <TouchableOpacity
                 onPress={handleDecrease}
-                className="bg-slate-900 p-1 rounded-lg"
+                className="bg-stone-700 p-1 rounded-lg"
               >
                 <MaterialCommunityIcons name="minus" color="white" size={20} />
               </TouchableOpacity>
@@ -202,7 +249,7 @@ const CardProduct = ({
 
               <TouchableOpacity
                 onPress={handleIncrease}
-                className="bg-slate-900 p-1 rounded-lg"
+                className="bg-stone-700 p-1 rounded-lg"
               >
                 <MaterialCommunityIcons name="plus" color="white" size={20} />
               </TouchableOpacity>
@@ -221,7 +268,7 @@ const CardProduct = ({
             <Text className="text-sm">{stock}</Text>
           </View>
           <TouchableOpacity
-            className="p-2 rounded-lg bg-slate-900"
+            className="p-2 rounded-lg bg-stone-700"
             onPress={() => addToCart(quantity)}
           >
             <MaterialCommunityIcons
