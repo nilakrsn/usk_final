@@ -13,9 +13,9 @@ import {
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 
-const WithDrawBank = ({ navigation }) => {
+const TopUpBank = ({ navigation }) => {
   const [dataSiswa, setDataSiswa] = useState([]);
-  const [withDraw, setWithDraw] = useState("");
+  const [topUp, setTopUp] = useState("");
   const [selectedUser, setSelectedUser] = useState(0);
 
   const getdataSiswa = async ()=> {
@@ -32,18 +32,18 @@ const WithDrawBank = ({ navigation }) => {
     }
   }
 
-  const WithDrawBank = async() => {
+  const topUpBank = async() => {
     try{
       const token = await AsyncStorage.getItem("token");
-     await axios.post(`${API_URL}withdraw-bank`,{
+     await axios.post(`${API_URL}topup-bank`,{
       users_id: selectedUser,
-      debit: withDraw
+      credit: topUp
      },{
         headers:{
           Authorization: `Bearer ${token}`
         }
       });
-      Alert.alert("Withdraw Success");
+      Alert.alert("Topup Success");
       navigation.navigate("MainBank");
       
     }catch(e){
@@ -82,15 +82,15 @@ const WithDrawBank = ({ navigation }) => {
             <TextInput
               className={`${textInputStyle}`}
               placeholder="Value"
-              value={withDraw}
-              onChangeText={(text) => setWithDraw(text)}
+              value={topUp}
+              onChangeText={(text) => setTopUp(text)}
             />
           </View>
 
           <View className="mt-3">
             <TouchableOpacity
               className="bg-cyan-500 p-4 rounded-lg"
-              onPress={WithDrawBank}
+              onPress={topUpBank}
             >
               <Text className="text-base text-white font-bold text-center">
                 Continue
@@ -103,4 +103,4 @@ const WithDrawBank = ({ navigation }) => {
   );
 };
 
-export default WithDrawBank;
+export default TopUpBank;

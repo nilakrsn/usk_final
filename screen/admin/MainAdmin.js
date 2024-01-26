@@ -1,13 +1,12 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import React from "react";
-import { Text, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import HomeUser from "./HomeUser";
-import CartPage from "./CartPage";
-import ProfilePage from "./ProfilePage";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import HistoryPage from "./HistoryPage";
-function MainUser() {
+import HomeAdmin from "./HomeAdmin";
+import HistoryTrasanction from "./HistoryTransaction";
+import UserAdmin from "./UserAdmin";
+import HistoryTopUp from "./HistoryTopUp";
+
+const MainAdmin = () => {
   const Tab = createBottomTabNavigator();
   return (
     <Tab.Navigator
@@ -17,52 +16,52 @@ function MainUser() {
       style={{ borderTopWidth: 1, borderTopColor: "#E2E8F0" }}
     >
       <Tab.Screen
-        name="HomeUser"
-        component={HomeUser}
+        name="HomeAdmin"
+        component={HomeAdmin}
         options={{
           tabBarLabel: "Home",
-          tabBarIcon: ({ color}) => (
+          tabBarIcon: ({ color }) => (
             <MaterialCommunityIcons name="home" color={color} size={26} />
           ),
           headerShown: false,
         }}
       />
       <Tab.Screen
-        name="CartPage"
-        component={CartPage}
+        name="UserAdmin"
+        component={UserAdmin}
         options={{
-          tabBarLabel: "Cart",
+          tabBarLabel: "User",
           tabBarIcon: ({ color }) => (
-            <MaterialCommunityIcons name="cart" color={color} size={26} />
+            <MaterialCommunityIcons name="account" color={color} size={26} />
           ),
           headerShown: false,
         }}
       />
       <Tab.Screen
-        name="HistoryPage"
-        component={HistoryPage}
+        name="HistoryTransaction"
+        component={HistoryTrasanction}
         options={{
-          tabBarLabel: "History",
-          tabBarIcon: ({ color}) => (
+          tabBarLabel: "Transaction",
+          tabBarIcon: ({ color }) => (
             <MaterialCommunityIcons name="history" color={color} size={26} />
           ),
           headerShown: false,
         }}
       />
       <Tab.Screen
-        name="ProfilePage"
-        component={ProfilePage}
+        name="HistoryTopUp"
+        component={HistoryTopUp}
         options={{
-          tabBarLabel: "Profile",
-          tabBarIcon: ({ color}) => (
-            <MaterialCommunityIcons name="account" color={color} size={26} />
+          tabBarLabel: "TopUp",
+          tabBarIcon: ({ color }) => (
+            <MaterialCommunityIcons name="wallet" color={color} size={26} />
           ),
           headerShown: false,
         }}
       />
+      
     </Tab.Navigator>
   );
 };
 
-
-export default MainUser;
+export default MainAdmin;

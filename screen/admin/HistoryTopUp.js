@@ -1,25 +1,25 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { API_URL } from "../constantAPI";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { View, Text, TouchableOpacity } from "react-native";
+import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { SafeAreaView } from "react-native";
 import {
   GestureHandlerRootView,
   RefreshControl,
-  ScrollView,
 } from "react-native-gesture-handler";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import { API_URL } from "../constantAPI";
 import { printToFileAsync } from "expo-print";
 import { shareAsync } from "expo-sharing";
-const TopUpList = ({ navigator }) => {
+
+const HistoryTopUp = ({ route }) => {
   const [dataBank, setDataBank] = useState([]);
   const [refresh, setRefresh] = useState(false);
 
   const getDataBank = async () => {
     try {
       const token = await AsyncStorage.getItem("token");
-      const response = await axios.get(`${API_URL}bank`, {
+      const response = await axios.get(`${API_URL}admin`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -31,22 +31,16 @@ const TopUpList = ({ navigator }) => {
     }
   };
 
+  useEffect(() => {
+    getDataBank();
+  }, []);
+
   const onRefresh = () => {
     setRefresh(true);
     getDataBank();
     setTimeout(() => {
       setRefresh(false);
     }, 2000);
-  };
-
-  useEffect(() => {
-    getDataBank();
-  }, []);
-
-  const formatDate = (timestamp) => {
-    const date = new Date(timestamp);
-    const options = { year: "numeric", month: "long", day: "numeric" };
-    return date.toLocaleDateString(undefined, options);
   };
   const formatHour = (timestamp) => {
     const date = new Date(timestamp);
@@ -57,7 +51,11 @@ const TopUpList = ({ navigator }) => {
     };
     return date.toLocaleTimeString(undefined, options);
   };
-
+  const formatDate = (timestamp) => {
+    const date = new Date(timestamp);
+    const options = { year: "numeric", month: "long", day: "numeric" };
+    return date.toLocaleDateString(undefined, options);
+  };
   const printHistory = async () => {
     try {
       const file = await printToFileAsync({
@@ -137,6 +135,7 @@ const TopUpList = ({ navigator }) => {
   </body>
 </html>
 `;
+
   return (
     <GestureHandlerRootView>
       <SafeAreaView className="bg-white w-full h-full">
@@ -145,30 +144,29 @@ const TopUpList = ({ navigator }) => {
             <RefreshControl refreshing={refresh} onRefresh={onRefresh} />
           }
         >
-          <View className=" w-full p-3 border-b border-slate-300  bg-white ">
-            <View className="flex flex-row justify-between items-center">
-              <Text className="font-bold text-lg">History</Text>
+          <View className=" w-full p-3 py-4 border-b border-slate-300 bg-white ">
+            <View className="pt-6 flex flex-row justify-between items-center">
+              <Text className="font-bold text-lg">History Top Up</Text>
               <TouchableOpacity onPress={printHistory}>
-                <Text className="font-bold text-cyan-500 text-md">
+                <Text className="font-bold text-md text-cyan-500">
                   Download All
                 </Text>
               </TouchableOpacity>
             </View>
           </View>
           <View className="py-0 flex p-3 justify-between">
-            
             <View>
               {dataBank.wallets?.map((item, index) => (
                 <View
                   key={index}
-                  className="border mb-2 border-slate-300 px-3 py-2 rounded-lg flex flex-row justify-between items-center"
+                  className="border mb-2 border-slate-300 px-3 py-1 rounded-lg flex flex-row justify-between items-center"
                 >
                   <View className="flex flex-row items-center">
                     <View className="gap-0">
                       <Text className="text-base font-bold">
                         {item.user.name}
                       </Text>
-
+                     
                       <View className="flex flex-row">
                         {item.credit || (0 && item.debit) || 0 ? (
                           <Text className="text-md">
@@ -186,7 +184,7 @@ const TopUpList = ({ navigator }) => {
                       </Text>
                     </View>
                   </View>
-                  <View className="flex flex-row justify-between items-center">
+                  <View className="flex flex-row justify-between">
                     <Text
                       className={`font-bold text-md ${
                         item.status === "selesai"
@@ -196,18 +194,6 @@ const TopUpList = ({ navigator }) => {
                     >
                       {item.status}
                     </Text>
-                    {item.status === "process" && (
-                      <TouchableOpacity
-                        className="p-1 rounded-full bg-cyan-500 ml-3"
-                        onPress={() => acceptTopUp(item.id)}
-                      >
-                        <MaterialCommunityIcons
-                          name="check"
-                          color="white"
-                          size={20}
-                        />
-                      </TouchableOpacity>
-                    )}
                   </View>
                 </View>
               ))}
@@ -219,4 +205,4 @@ const TopUpList = ({ navigator }) => {
   );
 };
 
-export default TopUpList;
+export default HistoryTopUp;

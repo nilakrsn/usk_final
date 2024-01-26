@@ -90,11 +90,11 @@ const ProductCanteen = ({ navigation, route }) => {
             {dataProduk.products?.map((item, index) => (
               <View
                 key={index}
-                className="flex p-3 border border-slate-300 bg-white"
+                className="flex px-3 py-2 border border-slate-300 bg-white"
               >
                 <View className="flex justify-between flex-row">
                   <View className="flex-row flex">
-                    <View className="bg-slate-900 rounded-lg mr-3 basis-auto">
+                    <View className="bg-cyan-500 rounded-lg mr-3 basis-auto">
                       <Image
                         className="h-16 w-20 rounded-lg"
                         source={{
@@ -102,28 +102,26 @@ const ProductCanteen = ({ navigation, route }) => {
                         }}
                       />
                     </View>
-                    <View className="flex basis-auto">
+                    <View>
+                      <Text className="font-bold text-base">
+                        {item.name} |{" "}
+                        <MaterialCommunityIcons
+                          name="store"
+                          color="black"
+                          size={15}
+                        />
+                        <Text className="text-sm">{item.stand}</Text>
+                      </Text>
+                      <Text className="text-sm  -mt-1">Rp{item.price}</Text>
                       <View className="flex ">
-                        <View className="flex w-auto flex-row justify-between">
-                          <Text className="font-bold text-base">
-                            {item.name}
-                          </Text>
-                        </View>
-                        <Text className="font-base text-base text-slate-800 -mt-1">
-                          Rp{item.price}
-                        </Text>
+                        <Text className="text-sm">Stock: {item.stock}</Text>
                       </View>
-                      <View className="flex ">
-                        <Text className="font-base text-sm text-slate-800">
-                          Stock: {item.stock}
-                        </Text>
-                      </View>
+                     
                     </View>
                   </View>
-                  <View className="flex flex-row gap-3 justify-end items-center">
+                  <View className="flex flex-row items-center gap-3">
                     <View>
                       <TouchableOpacity
-                        className="bg-stone-700 p-1 rounded-md"
                         onPress={() => {
                           Alert.alert(
                             "Delete",
@@ -143,23 +141,22 @@ const ProductCanteen = ({ navigation, route }) => {
                         }}
                       >
                         <MaterialCommunityIcons
-                          name="trash-can-outline"
-                          size={20}
-                          color="white"
+                          name="trash-can"
+                          size={24}
+                          color="black"
                         />
                       </TouchableOpacity>
                     </View>
                     <View>
                       <TouchableOpacity
-                        className="bg-stone-700 p-1 rounded-md"
                         onPress={() =>
                           navigation.navigate("EditProduct", { id: item.id })
                         }
                       >
                         <MaterialCommunityIcons
-                          name="pencil-outline"
-                          size={20}
-                          color="white"
+                          name="pencil"
+                          size={24}
+                          color="black"
                         />
                       </TouchableOpacity>
                     </View>

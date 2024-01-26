@@ -95,10 +95,10 @@ const CartPage = ({ navigation, route }) => {
             </View>
           </View>
           <View className="py-0 p-3">
-            <View className="bg-stone-700 p-4 rounded-lg flex flex-row justify-between items-center">
+            <View className="bg-cyan-500 p-4 rounded-lg flex flex-row justify-between items-center">
               <View>
                 <Text className="text-white font-bold text-lg">Total</Text>
-                <Text className="text-white text-base">
+                <Text className="text-white text-md">
                   Rp{data.totalPrice}
                 </Text>
               </View>
@@ -106,14 +106,14 @@ const CartPage = ({ navigation, route }) => {
                 {data.totalPrice > data.difference ||
                 data.transactionsKeranjang <= 0 ? (
                   <TouchableOpacity
-                    className="bg-red-600 py-2 rounded-full px-3"
+                    className="bg-red-500 py-1 rounded-full px-2"
                     disabled
                   >
-                    <Text className="text-white font-bold">Cannot Payment</Text>
+                    <Text className="text-white font-bold text-md">Cannot Payment</Text>
                   </TouchableOpacity>
                 ) : (
                   <TouchableOpacity
-                    className="bg-white py-2 rounded-full px-6"
+                    className="bg-white py-1 rounded-md px-6"
                     onPress={payProduct}
                   >
                     <Text className="text-black font-bold">Buy</Text>
@@ -122,7 +122,7 @@ const CartPage = ({ navigation, route }) => {
               </View>
             </View>
           </View>
-          <View className="py-0 flex p-3 justify-between">
+          <View className="py-0 flex px-3 justify-between">
             <View>
               <Text className="font-bold text-lg mb-2">
                 Your Cart {data.keranjanglength} result
@@ -147,12 +147,12 @@ const CartPage = ({ navigation, route }) => {
                   </View>
                 </View>
                 <TouchableOpacity
-                  className="bg-stone-700 p-2 rounded-lg"
+                 
                   onPress={() => cancelCart(item.id)}
                 >
                   <MaterialCommunityIcons
                     name="delete"
-                    color="white"
+                    color="black"
                     size={20}
                   />
                 </TouchableOpacity>

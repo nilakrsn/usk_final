@@ -68,6 +68,15 @@ const HomeBank = ({ navigation }) => {
     const options = { year: "numeric", month: "long", day: "numeric" };
     return date.toLocaleDateString(undefined, options);
   };
+  const formatHour = (timestamp) => {
+    const date = new Date(timestamp);
+    const options = {
+      hour: "numeric",
+      minute: "numeric",
+      hour12: false,
+    };
+    return date.toLocaleTimeString(undefined, options);
+  };
 
   const onRefresh = () => {
     setRefresh(true);
@@ -124,56 +133,70 @@ const HomeBank = ({ navigation }) => {
               </TouchableOpacity>
             </View>
           </View>
-          <View className="py-0 flex p-3 justify-between">
-            <View className="flex flex-row gap-3 py-2 justify-between mb-3">
-              <View className="bg-white flex-1 flex-row items-center justify-center p-5 py-3 border border-slate-300 rounded-lg">
-                <View className=" flex flex-row items-center gap-2">
+          <View className="p-3  justify-between">
+            <View className="bg-cyan-500 p-2 rounded-lg flex flex-col items-center">
+              <View className=" flex flex-row gap-3 mb-3">
+                <View className=" flex-1  flex-row items-center  justify-center">
                   <View>
-                    <Text className="font-bold text-lg">Balance Total</Text>
-                    <Text className="text-lg">Rp{dataBank.balanceBank}</Text>
+                    <Text className="font-bold text-lg text-white">
+                      Balance Total
+                    </Text>
+                    <Text className="text-base text-white text-center">
+                      Rp{dataBank.balanceBank}
+                    </Text>
                   </View>
+                </View>
+                <View className="flex-1 flex-row items-center justify-center ">
                   <View>
-                    <TouchableOpacity
-                      className="bg-stone-700 p-1 rounded-md"
-                      onPress={() => {
-                        navigation.navigate("WithDrawBank");
-                      }}
-                    >
-                      <MaterialCommunityIcons
-                        name="wallet-plus"
-                        color="#ffffff"
-                        size={20}
-                      />
-                    </TouchableOpacity>
+                    <Text className="font-bold text-lg text-white">
+                      Nasabah
+                    </Text>
+                    <Text className="text-base text-white text-center">
+                      {dataBank.nasabah}
+                    </Text>
                   </View>
                 </View>
               </View>
-              <View className="bg-white flex-1 p-4 py-3 border border-slate-300 rounded-lg">
-                <View className="gap-0">
-                  <Text className="font-bold text-black text-lg">Nasabah</Text>
-                  <Text className="text-lg">{dataBank.nasabah}</Text>
+              <View className=" flex flex-row gap-3">
+                <View className="flex-1">
+                  <TouchableOpacity
+                    className="bg-white rounded-md p-3"
+                    onPress={() => navigation.navigate("TopUpBank")}
+                  >
+                    <Text className="text-black font-bold text-center text-md">
+                      Top Up
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+                <View className="flex-1">
+                  <TouchableOpacity
+                    className=" bg-white rounded-md p-3"
+                    onPress={() => navigation.navigate("WithDrawBank")}
+                  >
+                    <Text className="text-black font-bold text-center text-md">
+                      WithDraw
+                    </Text>
+                  </TouchableOpacity>
                 </View>
               </View>
             </View>
 
             <View>
-              <Text className="font-bold text-lg mb-2">History</Text>
+              <Text className="font-bold text-lg mb-2 py-1">History</Text>
             </View>
             {dataBank.wallets?.map((item, index) => (
               <View
                 key={index}
-                className="border mb-2 border-slate-300 p-4 rounded-lg flex flex-row justify-between items-center"
+                className="border mb-2 border-slate-300 px-3 py-2 rounded-lg flex flex-row justify-between items-center"
               >
                 <View className="flex flex-row items-center">
                   <View className="gap-0">
                     <Text className="text-base font-bold">
                       {item.user.name}
                     </Text>
-                    <Text className="text-md">
-                      {formatDate(item.created_at)}
-                    </Text>
+
                     <View className="flex flex-row">
-                      {item.credit || 0 && item.debit || 0 ? (
+                      {item.credit || (0 && item.debit) || 0 ? (
                         <Text className="text-md">
                           Credit: Rp{item.credit || 0}
                         </Text>
@@ -183,11 +206,15 @@ const HomeBank = ({ navigation }) => {
                         </Text>
                       )}
                     </View>
+                    <Text className="text-sm text-gray-400">
+                      {formatDate(item.created_at)} |{" "}
+                      {formatHour(item.created_at)}
+                    </Text>
                   </View>
                 </View>
-                <View className="flex flex-row justify-between">
+                <View className="flex flex-row justify-between items-center">
                   <Text
-                    className={`font-bold text-lg ${
+                    className={`font-bold text-md ${
                       item.status === "selesai"
                         ? "text-green-600"
                         : "text-yellow-500"
@@ -197,7 +224,7 @@ const HomeBank = ({ navigation }) => {
                   </Text>
                   {item.status === "process" && (
                     <TouchableOpacity
-                      className="p-1 rounded-full bg-stone-700 ml-3"
+                      className="p-1 rounded-full bg-cyan-500 ml-3"
                       onPress={() => acceptTopUp(item.id)}
                     >
                       <MaterialCommunityIcons

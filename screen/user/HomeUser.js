@@ -120,27 +120,35 @@ const HomeUser = ({ navigation, route }) => {
               </TouchableOpacity>
             </View>
           </View>
-          <View className="py-0 p-3">
-            <View className="bg-stone-700 p-4 rounded-lg flex flex-row justify-between items-center">
+          <View className="p-3">
+            <View className="bg-cyan-500 p-4 rounded-lg flex flex-row justify-between items-center">
               <View>
                 <Text className="text-white font-bold text-lg">Balance</Text>
-                <Text className="text-white text-base">
+                <Text className="text-white text-md">
                   Rp{data.difference}
                 </Text>
               </View>
-              <View>
+              <View className="gap-2">
                 <TouchableOpacity
-                  className="bg-white py-2 rounded-full px-6"
+                  className="bg-white py-1 rounded-md px-3"
                   onPress={() => navigation.navigate("TopUp")}
                 >
-                  <Text className="text-black font-bold text-center">
+                  <Text className="text-black font-bold text-center text-md">
                     Top Up
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  className="bg-white py-1 rounded-md px-3"
+                  onPress={() => navigation.navigate("WithDraw")}
+                >
+                  <Text className="text-black font-bold text-center text-md">
+                    WithDraw
                   </Text>
                 </TouchableOpacity>
               </View>
             </View>
           </View>
-          <View className="py-0 flex p-3 justify-between">
+          <View className="py-0 flex px-3 justify-between">
             <View>
               <Text className="font-bold text-lg mb-2">Data Product</Text>
             </View>
@@ -212,35 +220,33 @@ const CardProduct = ({ id, name, photo, stock, price, navigation }) => {
   };
 
   return (
-    <View className="flex flex-row justify-between border border-slate-300 p-3 rounded-lg mb-2">
+    <View className="flex flex-row justify-between border border-slate-300 px-3 py-1 rounded-lg mb-2">
       <View className="flex flex-row gap-4">
-        <View>
-          <View className="bg-stone-700 rounded-lg basis-auto">
+        <View className="justify-center">
+          <View className="bg-cyan-500 rounded-lg basis-auto">
             <Image
-              className="h-24 w-20 rounded-lg"
+              className="h-20 w-20 rounded-lg"
               source={{
                 uri: photo,
               }}
             />
           </View>
         </View>
-        <View>
-          <Text className="text-lg font-bold">{name}</Text>
-          <Text className="text-base">Rp{price}</Text>
-          <View className="flex flex-row items-center justify-between">
-            <View style={{ alignItems: "center" }} className="flex flex-row">
+        <View className="justify-center">
+          <Text className="text-base font-bold">{name}</Text>
+          <Text className="text-md">Rp{price}</Text>
+            <View  className="flex flex-row items-center">
               <TouchableOpacity
                 onPress={handleDecrease}
-                className="bg-stone-700 p-1 rounded-lg"
               >
-                <MaterialCommunityIcons name="minus" color="white" size={20} />
+                <MaterialCommunityIcons name="minus" color="black" size={16} />
               </TouchableOpacity>
 
               <TextInput
                 style={{
                   textAlign: "center",
                   margin: 10,
-                  fontSize: 19,
+                  fontSize: 15,
                 }}
                 keyboardType="numeric"
                 value={quantity.toString()}
@@ -249,32 +255,30 @@ const CardProduct = ({ id, name, photo, stock, price, navigation }) => {
 
               <TouchableOpacity
                 onPress={handleIncrease}
-                className="bg-stone-700 p-1 rounded-lg"
+               
               >
-                <MaterialCommunityIcons name="plus" color="white" size={20} />
+                <MaterialCommunityIcons name="plus" color="black" size={16} />
               </TouchableOpacity>
             </View>
-          </View>
         </View>
       </View>
       <View>
         <View className="flex justify-between items-end py-2 gap-7">
           <View className="flex flex-row">
             <MaterialCommunityIcons
-              name="store-outline"
+              name="store"
               color="black"
               size={20}
             />
             <Text className="text-sm">{stock}</Text>
           </View>
           <TouchableOpacity
-            className="p-2 rounded-lg bg-stone-700"
             onPress={() => addToCart(quantity)}
           >
             <MaterialCommunityIcons
-              name="cart-outline"
-              color="white"
-              size={18}
+              name="cart"
+              color="black"
+              size={19}
             />
           </TouchableOpacity>
         </View>

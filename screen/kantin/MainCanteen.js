@@ -4,6 +4,7 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 import HomeCanteen from "./HomeCanteen";
 import ProductCanteen from "./ProductCanteen";
 import OrderPage from "./OrderPage";
+import CategoryKantin from "./CategoryKantin";
 const MainCanteen = () => {
   const Tab = createBottomTabNavigator();
   return (
@@ -31,6 +32,17 @@ const MainCanteen = () => {
           tabBarLabel: "Cart",
           tabBarIcon: ({ color }) => (
             <MaterialCommunityIcons name="dresser" color={color} size={26} />
+          ),
+          headerShown: false,
+        }}
+      />
+      <Tab.Screen
+        name="CategoryKantin"
+        component={CategoryKantin}
+        options={{
+          tabBarLabel: "Category",
+          tabBarIcon: ({ color}) => (
+            <MaterialCommunityIcons name="grid" color={color} size={26} />
           ),
           headerShown: false,
         }}

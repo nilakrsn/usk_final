@@ -38,6 +38,7 @@ const ProfilePage = ({ navigation, route }) => {
       setWalletProcess(response.data.walletProcess);
       setWalletSelesai(response.data.walletSelesai);
       setHistoryBeli(response.data.transactionsBayar);
+      console.log(response.data);
     } catch (e) {
       console.log(e);
     }
@@ -90,6 +91,15 @@ const ProfilePage = ({ navigation, route }) => {
     const options = { year: "numeric", month: "long", day: "numeric" };
     return date.toLocaleDateString(undefined, options);
   };
+  const formatHour = (timestamp) => {
+    const date = new Date(timestamp);
+    const options = {
+      hour: "numeric",
+      minute: "numeric",
+      hour12: false,
+    };
+    return date.toLocaleTimeString(undefined, options);
+  };
 
   useEffect(() => {
     getDataHistory();
@@ -136,27 +146,35 @@ const ProfilePage = ({ navigation, route }) => {
               </TouchableOpacity>
             </View>
           </View>
-          <View className="py-0 p-3">
-            <View className="bg-stone-700 p-4 rounded-lg flex flex-row justify-between items-center">
+          <View className="p-3">
+            <View className="bg-cyan-500 p-4 rounded-lg flex flex-row justify-between items-center">
               <View>
                 <Text className="text-white font-bold text-lg">Balance</Text>
-                <Text className="text-white text-base">
+                <Text className="text-white text-md">
                   Rp{dataSiswa.balance}
                 </Text>
               </View>
-              <View>
+              <View className="gap-2">
                 <TouchableOpacity
-                  className="bg-white py-2 rounded-full px-6"
+                  className="bg-white py-1 rounded-md px-3"
                   onPress={() => navigation.navigate("TopUp")}
                 >
-                  <Text className="text-black font-bold text-center">
+                  <Text className="text-black font-bold text-center text-md">
                     Top Up
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  className="bg-white py-1 rounded-md px-3"
+                  onPress={() => navigation.navigate("WithDraw")}
+                >
+                  <Text className="text-black font-bold text-center text-md">
+                    WithDraw
                   </Text>
                 </TouchableOpacity>
               </View>
             </View>
           </View>
-          <View className="py-0 flex p-3 justify-between">
+          <View className="py-0 p-3 flex justify-between">
             {walletProcess && walletProcess.length > 0 && (
               <View>
                 <Text className="font-bold text-lg mb-2">Top up process</Text>
@@ -164,18 +182,19 @@ const ProfilePage = ({ navigation, route }) => {
                   <View
                     key={index}
                     className={
-                      item.credit === 0 || item.credit === null 
+                      item.credit === 0 || item.credit === null
                         ? `hidden`
                         : `flex flex-row justify-between items-center border border-slate-300 rounded-lg p-3 mb-3`
                     }
                   >
                     <View>
-                      <Text className="text-base  font-bold">
-                        {formatDate(item.created_at)}
+                      <Text className="text-md font-bold">Rp{item.credit}</Text>
+                      <Text className="text-sm  text-gray-400">
+                        {formatDate(item.created_at)} |{" "}
+                        {formatHour(item.created_at)}
                       </Text>
-                      <Text className="text-md">Rp{item.credit}</Text>
                     </View>
-                    <Text className="text-base text-yellow-600 font-bold">
+                    <Text className="text-md text-yellow-500 font-bold">
                       {item.status}
                     </Text>
                   </View>
@@ -195,60 +214,60 @@ const ProfilePage = ({ navigation, route }) => {
                     }
                   >
                     <View>
-                      <Text className="text-base font-bold">
-                        {formatDate(item.created_at)}
+                      <Text className="text-md font-bold ">
+                        Rp{item.credit}
                       </Text>
-                      <Text className="text-md ">Rp{item.credit}</Text>
+                      <Text className="text-sm text-gray-400">
+                        {formatDate(item.created_at)} |{" "}
+                        {formatHour(item.created_at)}
+                      </Text>
                     </View>
-                    <Text className="text-base text-green-700 font-bold">
+                    <Text className="text-md text-green-700 font-bold">
                       {item.status}
                     </Text>
                   </View>
                 ))}
               </View>
             )}
-            {historyBeli &&
-              historyBeli.length >
-                0 && (
-                  <View>
-                    <Text className="font-bold text-lg mb-2">
-                      History Transaction
+            {historyBeli && historyBeli.length > 0 && (
+              <View>
+                <Text className="font-bold text-lg mb-2">
+                  History Transaction
+                </Text>
+                {historyBeli?.map((item, index) => (
+                  <View
+                    key={index}
+                    className={
+                      item.credit === 0 || item.credit === null
+                        ? `hidden`
+                        : `flex border border-slate-300 rounded-lg p-3 mb-3 flex-row items-center justify-between`
+                    }
+                  >
+                    <View>
+                      <Text className="text-md font-bold">
+                        {item.order_code}
+                      </Text>
+                      <Text className="text-md">
+                        {item.products.name} | {item.quantity}x
+                      </Text>
+                      <Text className="text-sm text-gray-400">
+                        {formatDate(item.created_at)} |{" "}
+                        {formatHour(item.created_at)}
+                      </Text>
+                    </View>
+                    <Text
+                      className={
+                        item.status === "diambil"
+                          ? `font-bold text-gray-400 text-md`
+                          : `text-black font-bold text-md`
+                      }
+                    >
+                      {item.status}
                     </Text>
-                    {historyBeli?.map((item, index) => (
-                      <View
-                        key={index}
-                        className={
-                          item.credit === 0 || item.credit === null
-                            ? `hidden`
-                            : `flex border border-slate-300 rounded-lg p-3 mb-3 flex-row items-center justify-between`
-                        }
-                      >
-                        <View>
-                          <Text className="text-base font-bold">
-                            {item.order_code}
-                          </Text>
-                          <Text className="text-md">
-                            {formatDate(item.created_at)}
-                          </Text>
-                          <Text className="text-md">
-                            {item.products.name} | {item.quantity}x
-                          </Text>
-                        </View>
-                        <View>
-                          <Text
-                            className={
-                              item.status === "diambil"
-                                ? `font-bold text-slate-400`
-                                : `text-slate-900 font-bold`
-                            }
-                          >
-                            {item.status}
-                          </Text>
-                        </View>
-                      </View>
-                    ))}
                   </View>
-                )}
+                ))}
+              </View>
+            )}
           </View>
         </ScrollView>
       </SafeAreaView>

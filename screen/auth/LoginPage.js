@@ -45,6 +45,9 @@ const LoginPage = ({ navigation }) => {
       case "kantin":
         navigation.navigate("MainCanteen");
         break;
+      case "admin":
+        navigation.navigate("MainAdmin");
+        break;
       default:
         navigation.navigate("MainUser");
         break;
@@ -83,14 +86,14 @@ const LoginPage = ({ navigation }) => {
             <Text className="text-base">Don't have an account?</Text>
           </View>
           <View>
-            <TouchableOpacity onPress={() => navigation.navigate("SignIn")}>
-              <Text className="font-bold text-blue-500 text-base">SignUp</Text>
+            <TouchableOpacity onPress={() => navigation.navigate("SignUpPage")}>
+              <Text className="font-bold text-cyan-500 text-base">SignUp</Text>
             </TouchableOpacity>
           </View>
         </View>
         <View className="py-2">
           <TouchableOpacity
-            className="bg-stone-700 p-4 rounded-lg"
+            className="bg-cyan-500 p-4 rounded-lg"
             onPress={loginUser}
           >
             <Text className="text-base text-white font-bold text-center">

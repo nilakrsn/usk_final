@@ -4,7 +4,7 @@ import { Text, TextInput, View, TouchableOpacity, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { API_URL } from "../constantAPI";
 
-const SignInPage = ({ navigation }) => {
+const SignUpPage = ({ navigation }) => {
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -73,13 +73,13 @@ const SignInPage = ({ navigation }) => {
           </View>
           <View>
             <TouchableOpacity onPress={() => navigation.navigate("Login")}>
-              <Text className="font-bold text-blue-500 text-base">Login</Text>
+              <Text className="font-bold text-cyan-500 text-base">Login</Text>
             </TouchableOpacity>
           </View>
         </View>
         <View className="py-2">
           <TouchableOpacity
-            className="bg-stone-700 p-4 rounded-lg"
+            className="bg-cyan-500 p-4 rounded-lg"
             onPress={SignUp}
           >
             <Text className="text-base text-white font-bold text-center">
@@ -92,4 +92,4 @@ const SignInPage = ({ navigation }) => {
   );
 };
 
-export default SignInPage;
+export default SignUpPage;

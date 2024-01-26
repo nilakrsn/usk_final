@@ -194,7 +194,7 @@ const EditProduct = ({ navigation, route }) => {
             </View>
             <View>
               <TouchableOpacity
-                className="bg-stone-700 p-4 rounded-lg"
+                className="bg-cyan-500 p-4 rounded-lg"
                 onPress={editProduct}
               >
                 <Text className="text-base text-white font-bold text-center">
