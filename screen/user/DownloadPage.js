@@ -23,8 +23,8 @@ import { shareAsync } from "expo-sharing";
 
 const DownloadPage = ({ route }) => {
   const [downloadData, setDownloadData] = useState([]);
-  const { order_code } = route.params;
   const [refresh, setRefresh] = useState(false);
+  const { order_code } = route.params;
 
   const getDataHistory = async () => {
     try {

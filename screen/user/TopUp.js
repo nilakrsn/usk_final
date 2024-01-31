@@ -26,14 +26,7 @@ const TopUp = ({ navigation }) => {
     }
   };
 
-  const onRefresh = () => {
-    setRefresh(true);
-    getData();
-    setTimeout(() => {
-      setRefresh(false);
-    }, 2000);
-  };
-
+ 
   const textInputStyle =
     "tracking-widest border p-3 py-3 text-base border-slate-900 rounded-lg w-full";
   return (

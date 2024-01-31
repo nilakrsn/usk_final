@@ -12,24 +12,66 @@ import {
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { printToFileAsync } from "expo-print";
 import { shareAsync } from "expo-sharing";
+import DateTimePicker from "@react-native-community/datetimepicker";
 const TopUpList = ({ navigator }) => {
   const [dataBank, setDataBank] = useState([]);
   const [refresh, setRefresh] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [filteredData, setFilteredData] = useState([]);
+  const [showDatePicker, setShowDatePicker] = useState(false);
+
+  const acceptTopUp = async (id) => {
+    const token = await AsyncStorage.getItem("token");
+    await axios.put(
+      `${API_URL}topup-success/${id}`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    Alert.alert("Confirm success");
+    getDataBank();
+  };
+  const handleDateChange = (event, selectedDate) => {
+    if (selectedDate === undefined || selectedDate === null) {
+      setShowDatePicker(false);
+      return;
+    }
+  
+    const currentDate = selectedDate || new Date();
+    setSelectedDate(currentDate);
+  
+    const filtered = dataBank.wallets.filter((item) => {
+      const itemDate = new Date(item.created_at);
+      const itemDateOnly = new Date(itemDate.getFullYear(), itemDate.getMonth(), itemDate.getDate());
+      const currentDateOnly = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate());
+      return itemDateOnly.getTime() === currentDateOnly.getTime();
+    });
+  
+    setFilteredData(filtered);
+    setShowDatePicker(false);
+  };
 
   const getDataBank = async () => {
     try {
       const token = await AsyncStorage.getItem("token");
-      const response = await axios.get(`${API_URL}bank`, {
+      const response = await axios.get(`${API_URL}admin`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
       setDataBank(response.data);
-      console.log(response.data);
+      setFilteredData(response.data.wallets || []);
     } catch (e) {
       console.log(e);
     }
   };
+
+  useEffect(() => {
+    getDataBank();
+  }, []);
 
   const onRefresh = () => {
     setRefresh(true);
@@ -39,15 +81,6 @@ const TopUpList = ({ navigator }) => {
     }, 2000);
   };
 
-  useEffect(() => {
-    getDataBank();
-  }, []);
-
-  const formatDate = (timestamp) => {
-    const date = new Date(timestamp);
-    const options = { year: "numeric", month: "long", day: "numeric" };
-    return date.toLocaleDateString(undefined, options);
-  };
   const formatHour = (timestamp) => {
     const date = new Date(timestamp);
     const options = {
@@ -56,6 +89,12 @@ const TopUpList = ({ navigator }) => {
       hour12: false,
     };
     return date.toLocaleTimeString(undefined, options);
+  };
+
+  const formatDate = (timestamp) => {
+    const date = new Date(timestamp);
+    const options = { year: "numeric", month: "long", day: "numeric" };
+    return date.toLocaleDateString(undefined, options);
   };
 
   const printHistory = async () => {
@@ -99,42 +138,40 @@ const TopUpList = ({ navigator }) => {
         justify-content: space-between;
         margin-top: 5px;
       }
-
-      
     </style>
   </head>
   <body> 
-  <h1>History ${dataBank.user ? dataBank.user.created_at : null}</h1>
-    ${
-      dataBank.wallets
-        ? dataBank.wallets
-            .map(
-              (value, index) => `
-            <div class="order-item" key=${index}>
-            <span>${value.user.name}</span>
-              <div class="product-info">
-              ${
-                value.credit || (0 && value.debit) || 0
-                  ? ` <span>Credit: Rp${value.credit || 0}</span>`
-                  : `<span>
-                  Debit: Rp${value.debit || 0}
-                </span>`
-              }
-                
-                <span>${value.created_at}</span>
-              </div>
-              <div class="status-info">
-                <span class="font-bold">Status:</span>
-                <span class="font-bold">${value.status}</span>
-              </div>
+  <h1>History Bank</h1>
+  ${
+    filteredData
+      ? filteredData
+          .map(
+            (value, index) => `
+          <div class="order-item" key=${index}>
+          <span>${value.user.name}</span>
+            <div class="product-info">
+            ${
+              value.credit || (0 && value.debit) || 0
+                ? ` <span>Credit: Rp${value.credit || 0}</span>`
+                : `<span>
+                Debit: Rp${value.debit || 0}
+              </span>`
+            }
+              
+              <span>${value.created_at}</span>
             </div>
-          `
-            )
-            .join("")
-        : ""
-    }
-    
-  </body>
+            <div class="status-info">
+              <span class="font-bold">Status:</span>
+              <span class="font-bold">${value.status}</span>
+            </div>
+          </div>
+        `
+          )
+          .join("")
+      : ""
+  }
+  
+</body>
 </html>
 `;
   return (
@@ -156,9 +193,20 @@ const TopUpList = ({ navigator }) => {
             </View>
           </View>
           <View className="py-0 flex p-3 justify-between">
-            
+          <View className=" p-1 py-2">
+              <TouchableOpacity onPress={() => setShowDatePicker(true)}>
+                <Text className="font-bold text-cyan-500">Choose Date</Text>
+              </TouchableOpacity>
+              {showDatePicker && (
+                <DateTimePicker
+                  value={selectedDate}
+                  onChange={handleDateChange}
+                  mode="date"
+                />
+              )}
+            </View>
             <View>
-              {dataBank.wallets?.map((item, index) => (
+              {filteredData.map((item, index) => (
                 <View
                   key={index}
                   className="border mb-2 border-slate-300 px-3 py-2 rounded-lg flex flex-row justify-between items-center"

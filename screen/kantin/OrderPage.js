@@ -11,9 +11,43 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 import { API_URL } from "../constantAPI";
 import { printToFileAsync } from "expo-print";
 import { shareAsync } from "expo-sharing";
+import DateTimePicker from "@react-native-community/datetimepicker";
+
 const OrderPage = () => {
   const [transaction, setTransaction] = useState([]);
   const [refresh, setRefresh] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [filteredData, setFilteredData] = useState([]);
+  const [showDatePicker, setShowDatePicker] = useState(false);
+
+  const handleDateChange = (event, selectedDate) => {
+    if (selectedDate === undefined || selectedDate === null) {
+      setShowDatePicker(false);
+      return;
+    }
+    if (!(selectedDate instanceof Date)) {
+      selectedDate = new Date(selectedDate);
+    }
+    const currentDate = selectedDate || new Date();
+    setSelectedDate(currentDate);
+
+    const filtered = transaction.filter((item) => {
+      const itemDate = new Date(item.created_at);
+      const itemDateOnly = new Date(
+        itemDate.getFullYear(),
+        itemDate.getMonth(),
+        itemDate.getDate()
+      );
+      const currentDateOnly = new Date(
+        currentDate.getFullYear(),
+        currentDate.getMonth(),
+        currentDate.getDate()
+      );
+      return itemDateOnly.getTime() === currentDateOnly.getTime();
+    });
+    setFilteredData(filtered);
+    setShowDatePicker(false);
+  };
 
   const getTransaction = async () => {
     try {
@@ -25,6 +59,7 @@ const OrderPage = () => {
       });
       console.log(response.data.transactions);
       setTransaction(response.data.transactions);
+      setFilteredData(response.data.transactions || []);
     } catch (e) {
       console.log(e);
     }
@@ -126,10 +161,10 @@ const OrderPage = () => {
     </style>
   </head>
   <body> 
- 
+  <h1>History Canteen</h1>
     ${
-      transaction
-        ? transaction
+      filteredData
+        ? filteredData
             .map(
               (value, index) => `
               <div class="order-item" key=${index}>
@@ -170,7 +205,7 @@ const OrderPage = () => {
           }
         >
           <View className=" w-full p-3 border-b border-slate-300  bg-white ">
-          <View className="flex flex-row justify-between items-center">
+            <View className="flex flex-row justify-between items-center">
               <Text className="font-bold text-lg ">History</Text>
               <TouchableOpacity onPress={printHistory}>
                 <Text className="font-bold text-cyan-500 text-sm">
@@ -180,7 +215,19 @@ const OrderPage = () => {
             </View>
           </View>
           <View className="py-0 flex p-3 justify-between">
-            {transaction?.map((item, index) => (
+            <View className=" p-1 py-2">
+              <TouchableOpacity onPress={() => setShowDatePicker(true)}>
+                <Text className="font-bold text-cyan-500">Choose Date</Text>
+              </TouchableOpacity>
+              {showDatePicker && (
+                <DateTimePicker
+                  value={selectedDate}
+                  onChange={handleDateChange}
+                  mode="date"
+                />
+              )}
+            </View>
+            {filteredData.map((item, index) => (
               <View
                 className="bg-white flex flex-row justify-between w-full border border-slate-300 items-center align-middle rounded-lg px-3 py-2 mb-2"
                 key={index}
@@ -189,20 +236,21 @@ const OrderPage = () => {
                   <Text className="text-base font-bold ">
                     {item.order_code}
                   </Text>
-                  
+
                   <View className="flex flex-col ">
                     {item.user_transactions?.map((value, index) => (
                       <Text className="text-md" key={index}>
                         {value.name}
                       </Text>
                     ))}
-                    <Text className="text-md">Rp{item.price} | {item.quantity}x</Text>
+                    <Text className="text-md">
+                      Rp{item.price} | {item.quantity}x
+                    </Text>
                   </View>
                   <Text className="text-sm text-gray-400">
                     {formatDate(item.created_at)} |{" "}
                     {formatHour(item.created_at)}
                   </Text>
-
                 </View>
                 {item.status === "dibayar" ? (
                   <Text className="text-md text-black font-bold">

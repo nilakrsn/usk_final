@@ -11,10 +11,34 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 import { API_URL } from "../constantAPI";
 import { printToFileAsync } from "expo-print";
 import { shareAsync } from "expo-sharing";
+import DateTimePicker from "@react-native-community/datetimepicker";
 
-const HistoryTopUp = ({ route }) => {
+const HistoryTopUp = () => {
   const [dataBank, setDataBank] = useState([]);
   const [refresh, setRefresh] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [filteredData, setFilteredData] = useState([]);
+  const [showDatePicker, setShowDatePicker] = useState(false);
+
+  const handleDateChange = (event, selectedDate) => {
+    if (selectedDate === undefined || selectedDate === null) {
+      setShowDatePicker(false);
+      return;
+    }
+  
+    const currentDate = selectedDate || new Date();
+    setSelectedDate(currentDate);
+  
+    const filtered = dataBank.wallets.filter((item) => {
+      const itemDate = new Date(item.created_at);
+      const itemDateOnly = new Date(itemDate.getFullYear(), itemDate.getMonth(), itemDate.getDate());
+      const currentDateOnly = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate());
+      return itemDateOnly.getTime() === currentDateOnly.getTime();
+    });
+  
+    setFilteredData(filtered);
+    setShowDatePicker(false);
+  };
 
   const getDataBank = async () => {
     try {
@@ -25,7 +49,7 @@ const HistoryTopUp = ({ route }) => {
         },
       });
       setDataBank(response.data);
-      console.log(response.data);
+      setFilteredData(response.data.wallets || []);
     } catch (e) {
       console.log(e);
     }
@@ -42,6 +66,7 @@ const HistoryTopUp = ({ route }) => {
       setRefresh(false);
     }, 2000);
   };
+
   const formatHour = (timestamp) => {
     const date = new Date(timestamp);
     const options = {
@@ -51,11 +76,13 @@ const HistoryTopUp = ({ route }) => {
     };
     return date.toLocaleTimeString(undefined, options);
   };
+
   const formatDate = (timestamp) => {
     const date = new Date(timestamp);
     const options = { year: "numeric", month: "long", day: "numeric" };
     return date.toLocaleDateString(undefined, options);
   };
+
   const printHistory = async () => {
     try {
       const file = await printToFileAsync({
@@ -97,42 +124,40 @@ const HistoryTopUp = ({ route }) => {
         justify-content: space-between;
         margin-top: 5px;
       }
-
-      
     </style>
   </head>
   <body> 
-  <h1>History ${dataBank.user ? dataBank.user.created_at : null}</h1>
-    ${
-      dataBank.wallets
-        ? dataBank.wallets
-            .map(
-              (value, index) => `
-            <div class="order-item" key=${index}>
-            <span>${value.user.name}</span>
-              <div class="product-info">
-              ${
-                value.credit || (0 && value.debit) || 0
-                  ? ` <span>Credit: Rp${value.credit || 0}</span>`
-                  : `<span>
-                  Debit: Rp${value.debit || 0}
-                </span>`
-              }
-                
-                <span>${value.created_at}</span>
-              </div>
-              <div class="status-info">
-                <span class="font-bold">Status:</span>
-                <span class="font-bold">${value.status}</span>
-              </div>
+  <h1>History Bank</h1>
+  ${
+    filteredData
+      ? filteredData
+          .map(
+            (value, index) => `
+          <div class="order-item" key=${index}>
+          <span>${value.user.name}</span>
+            <div class="product-info">
+            ${
+              value.credit || (0 && value.debit) || 0
+                ? ` <span>Credit: Rp${value.credit || 0}</span>`
+                : `<span>
+                Debit: Rp${value.debit || 0}
+              </span>`
+            }
+              
+              <span>${value.created_at}</span>
             </div>
-          `
-            )
-            .join("")
-        : ""
-    }
-    
-  </body>
+            <div class="status-info">
+              <span class="font-bold">Status:</span>
+              <span class="font-bold">${value.status}</span>
+            </div>
+          </div>
+        `
+          )
+          .join("")
+      : ""
+  }
+  
+</body>
 </html>
 `;
 
@@ -155,8 +180,20 @@ const HistoryTopUp = ({ route }) => {
             </View>
           </View>
           <View className="py-0 flex p-3 justify-between">
+            <View className=" p-1 py-2">
+              <TouchableOpacity onPress={() => setShowDatePicker(true)}>
+                <Text className="font-bold text-cyan-500">Choose Date</Text>
+              </TouchableOpacity>
+              {showDatePicker && (
+                <DateTimePicker
+                  value={selectedDate}
+                  onChange={handleDateChange}
+                  mode="date"
+                />
+              )}
+            </View>
             <View>
-              {dataBank.wallets?.map((item, index) => (
+              {filteredData.map((item, index) => (
                 <View
                   key={index}
                   className="border mb-2 border-slate-300 px-3 py-1 rounded-lg flex flex-row justify-between items-center"
@@ -166,7 +203,7 @@ const HistoryTopUp = ({ route }) => {
                       <Text className="text-base font-bold">
                         {item.user.name}
                       </Text>
-                     
+
                       <View className="flex flex-row">
                         {item.credit || (0 && item.debit) || 0 ? (
                           <Text className="text-md">

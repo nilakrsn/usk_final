@@ -11,11 +11,43 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 import { API_URL } from "../constantAPI";
 import { printToFileAsync } from "expo-print";
 import { shareAsync } from "expo-sharing";
+import DateTimePicker from "@react-native-community/datetimepicker";
 
 const HistoryTrasanction = ({ route }) => {
   const [report, setReport] = useState([]);
-  const { successTopUp } = route.params || {};
   const [refreshing, setRefreshing] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [filteredData, setFilteredData] = useState([]);
+  const [showDatePicker, setShowDatePicker] = useState(false);
+
+  const handleDateChange = (event, selectedDate) => {
+    if (selectedDate === undefined || selectedDate === null) {
+      setShowDatePicker(false);
+      return;
+    }
+    if (!(selectedDate instanceof Date)) {
+      selectedDate = new Date(selectedDate);
+    }
+    const currentDate = selectedDate || new Date();
+    setSelectedDate(currentDate);
+
+    const filtered = report.transactions.filter((item) => {
+      const itemDate = new Date(item.created_at);
+      const itemDateOnly = new Date(
+        itemDate.getFullYear(),
+        itemDate.getMonth(),
+        itemDate.getDate()
+      );
+      const currentDateOnly = new Date(
+        currentDate.getFullYear(),
+        currentDate.getMonth(),
+        currentDate.getDate()
+      );
+      return itemDateOnly.getTime() === currentDateOnly.getTime();
+    });
+    setFilteredData(filtered);
+    setShowDatePicker(false);
+  };
 
   const getDataHistory = async () => {
     const token = await AsyncStorage.getItem("token");
@@ -25,10 +57,11 @@ const HistoryTrasanction = ({ route }) => {
       },
     });
     setReport(response.data);
+    setFilteredData(response.data.transactions || []);
   };
   useEffect(() => {
     getDataHistory();
-  }, [successTopUp]);
+  },[]);
 
   const onRefresh = () => {
     setRefreshing(true);
@@ -101,10 +134,10 @@ const HistoryTrasanction = ({ route }) => {
     </style>
   </head>
   <body> 
- 
+  <h1>History Canteen</h1>
     ${
-      report.transactions
-        ? report.transactions
+      filteredData
+        ? filteredData
             .map(
               (value, index) => `
               <div class="order-item" key=${index}>
@@ -155,8 +188,20 @@ const HistoryTrasanction = ({ route }) => {
             </View>
           </View>
           <View className="py-0 flex p-3 justify-between">
+            <View className=" p-1 py-2">
+              <TouchableOpacity onPress={() => setShowDatePicker(true)}>
+                <Text className="font-bold text-cyan-500">Choose Date</Text>
+              </TouchableOpacity>
+              {showDatePicker && (
+                <DateTimePicker
+                  value={selectedDate}
+                  onChange={handleDateChange}
+                  mode="date"
+                />
+              )}
+            </View>
             <View>
-              {report.transactions?.map((item, index) => (
+              {filteredData.map((item, index) => (
                 <View
                   key={index}
                   className="flex flex-row justify-between items-center border border-slate-300 rounded-lg p-3 mb-3"
@@ -171,14 +216,13 @@ const HistoryTrasanction = ({ route }) => {
                       </Text>
                     ))}
                     <Text className="text-sm text-gray-400">
-                      {formatDate(item.created_at)} | {formatHour(item.created_at)}
+                      {formatDate(item.created_at)} |{" "}
+                      {formatHour(item.created_at)}
                     </Text>
                   </View>
                   <View>
                     {item.status === "dibayar" ? (
-                      <Text className="text-md font-bold">
-                        {item.status}
-                      </Text>
+                      <Text className="text-md font-bold">{item.status}</Text>
                     ) : item.status === "diambil" ? (
                       <Text className="text-md text-slate-400 font-bold">
                         {item.status}
