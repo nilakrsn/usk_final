@@ -14,45 +14,7 @@ import {
 import { Picker } from "@react-native-picker/picker";
 
 const WithDrawBank = ({ navigation }) => {
-  const [dataSiswa, setDataSiswa] = useState([]);
-  const [withDraw, setWithDraw] = useState("");
-  const [selectedUser, setSelectedUser] = useState(0);
-
-  const getdataSiswa = async ()=> {
-    try{
-      const token = await AsyncStorage.getItem("token");
-      const response = await axios.get(`${API_URL}bank`,{
-        headers:{
-          Authorization: `Bearer ${token}`
-        }
-      });
-      setDataSiswa(response.data);
-    }catch(e){
-      console.log(e);
-    }
-  }
-
-  const WithDrawBank = async() => {
-    try{
-      const token = await AsyncStorage.getItem("token");
-     await axios.post(`${API_URL}withdraw-bank`,{
-      users_id: selectedUser,
-      debit: withDraw
-     },{
-        headers:{
-          Authorization: `Bearer ${token}`
-        }
-      });
-      Alert.alert("Withdraw Success");
-      navigation.navigate("MainBank");
-      
-    }catch(e){
-      console.log(e);
-    }
-  }
-  useEffect(()=>{
-    getdataSiswa();
-  },[])
+ 
  
   const textInputStyle =
     "tracking-widest border p-3 py-3 text-base border-slate-900 rounded-lg w-full";

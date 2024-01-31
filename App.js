@@ -27,35 +27,7 @@ import EditUser from "./screen/admin/user-proses/EditUser";
 import SignUpPage from "./screen/auth/SignUpPage";
 
 const App = () => {
-  const Stack = createNativeStackNavigator();
-  const navigationRef = React.useRef();
-
-  const checkAuth = async () => {
-    const token = await AsyncStorage.getItem("token");
-    const role = await AsyncStorage.getItem("role");
-    if (token && role !== null) {
-      switch (role) {
-        case "admin":
-          navigationRef.current?.navigate("MainAdmin");
-          break;
-        case "bank":
-          navigationRef.current?.navigate("MainBank");
-          break;
-        case "kantin":
-          navigationRef.current?.navigate("MainCanteen");
-          break;
-        case "admin":
-          navigationRef.current?.navigate("MainAdmin");
-        default:
-          navigationRef.current?.navigate("MainUser");
-          break;
-      }
-    }
-  };
-
-  React.useEffect(() => {
-    checkAuth();
-  }, []);
+  
 
   return (
     <PaperProvider>

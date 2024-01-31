@@ -11,75 +11,7 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 import { API_URL } from "../constantAPI";
 
 const CartPage = ({ navigation, route }) => {
-  const [data, setData] = useState([]);
-  const [refresh, setRefresh] = useState(false);
-  const currentTime = new Date();
-  const seconds = currentTime.setSeconds();
-  const { successCart } = route.params || {};
-
-  const getDataHistory = async () => {
-    try {
-      const token = await AsyncStorage.getItem("token");
-      const response = await axios.get(`${API_URL}history`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      setData(response.data);
-    } catch (e) {
-      console.log(e);
-    }
-  };
-
-  const payProduct = async () => {
-    try {
-      const token = await AsyncStorage.getItem("token");
-      await axios.put(
-        `${API_URL}pay-product`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      Alert.alert("Payment success");
-      getDataHistory();
-      navigation.navigate("MainUser", { getDataSiswaCallBack: seconds });
-    } catch (e) {
-      console.log(e);
-    }
-  };
-
-  const cancelCart = async (id) => {
-    try {
-      const token = await AsyncStorage.getItem("token");
-      await axios.delete(`${API_URL}keranjang/delete/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      Alert.alert("success delete");
-      getDataHistory();
-    } catch (e) {
-      console.log(e);
-    }
-  };
-
-  const onRefresh = () => {
-    setRefresh(true);
-    getDataHistory();
-    setTimeout(() => {
-      setRefresh(false);
-    }, 2000);
-  };
-
-  useEffect(() => {
-    getDataHistory();
-    if (successCart === successCart || successCart !== successCart) {
-      getDataHistory();
-    }
-  }, [successCart]);
+ 
 
   return (
     <GestureHandlerRootView>

@@ -11,48 +11,7 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 import { API_URL } from "../constantAPI";
 
 const UserAdmin = ({ navigation, route }) => {
-  const [dataUser, setDatauser] = useState([]);
-  const [refresh, setRefresh] = useState(false);
-  const { createUserCallBack, editUserCallBack } = route.params || {};
-
-  const getDataUser = async () => {
-    try {
-      const token = await AsyncStorage.getItem("token");
-      const response = await axios.get(`${API_URL}getsiswa`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      setDatauser(response.data);
-    } catch (e) {
-      console.log(e);
-    }
-  };
-  const deleteUser = async (id) => {
-    const token = await AsyncStorage.getItem("token");
-    await axios.delete(`${API_URL}user-admin-delete/${id}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    getDataUser();
-    Alert.alert("Success delete");
-  };
-
-  const onRefresh = () => {
-    setRefresh(true);
-    getDataUser();
-    setTimeout(() => {
-      setRefresh(false);
-    }, 2000);
-  };
-  useEffect(() => {
-    getDataUser();
-    if (createUserCallBack || editUserCallBack) {
-      getDataUser();
-    }
-  }, [createUserCallBack, editUserCallBack]);
+ 
   return (
     <GestureHandlerRootView>
       <SafeAreaView className="bg-white w-full h-full">

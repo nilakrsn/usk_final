@@ -20,37 +20,7 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 import { API_URL } from "../constantAPI";
 
 const HistoryPage = ({ navigation }) => {
-  const [historyBeli, setHistoryBeli] = useState([]);
-  const [refresh, setRefresh] = useState(false);
-
-  const getDataHistory = async () => {
-    try {
-      const token = await AsyncStorage.getItem("token");
-      const response = await axios.get(`${API_URL}history`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      setHistoryBeli(response.data.laporanPembayaran);
-      console.log(response.data);
-    } catch (e) {
-      console.log(e);
-    }
-  };
-
- 
-  const onRefresh = () => {
-    setRefresh(true);
-    getDataHistory();
-    setTimeout(() => {
-      setRefresh(false);
-    }, 2000);
-  };
-
-  useEffect(() => {
-    getDataHistory();
-  }, []);
-
+  
   return (
     <GestureHandlerRootView>
       <SafeAreaView className="bg-white w-full h-full">

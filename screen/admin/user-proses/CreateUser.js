@@ -15,44 +15,7 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 import { API_URL } from "../../constantAPI";
 
 const CreateUser = ({ navigation }) => {
-  const [name, setName] = useState("");
-  const [password, setPassword] = useState("");
-  const [selectedRole, setSelectedRole] = useState(0);
-  const [roleUser, setRoleUser] = useState([]);
-  const currentTime = new Date();
-  const seconds = currentTime.getSeconds();
 
-
-  const getUserandRole = async () => {
-    const token = await AsyncStorage.getItem("token");
-    const response = await axios.get(`${API_URL}user-admin-create`,{
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    });
-    setRoleUser(response.data.data);
-    
-  }
-
-  const createUser = async () => {
-    const token = await AsyncStorage.getItem("token");
-    await axios.post(`${API_URL}user-admin-store`,{
-      name: name,
-      password: password,
-      roles_id: selectedRole
-    },{
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    });
-    Alert.alert("Success Create");
-    navigation.navigate("MainAdmin", {createUserCallback: seconds});
-    
-  }
-
-  useEffect(()=>{
-    getUserandRole();
-  },[]);
 
 
   const textInputStyle =

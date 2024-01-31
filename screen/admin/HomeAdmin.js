@@ -12,68 +12,8 @@ import {
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 
 const HomeAdmin = ({ navigation, route }) => {
-  const [dataAdmin, setDataAdmin] = useState([]);
-  const [refreshing, setRefreshing] = useState(false);
-  const { createUserCallBack, editUserCallBack } = route.params || {};
+ 
 
-  const getDataAdmin = async () => {
-    try {
-      const token = await AsyncStorage.getItem("token");
-      const response = await axios.get(`${API_URL}getsiswa`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      setDataAdmin(response.data);
-    } catch (e) {
-      console.log(e);
-    }
-  };
-
-  const deleteUser = async (id) => {
-    const token = await AsyncStorage.getItem("token");
-    await axios.delete(`${API_URL}user-admin-delete/${id}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    Alert.alert("Success delete");
-  };
-
-  const logout = async () => {
-    try {
-      const token = await AsyncStorage.getItem("token");
-      await axios.post(
-        `${API_URL}logout`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      await AsyncStorage.multiRemove(["token", "role"]);
-      navigation.navigate("Login");
-    } catch (e) {
-      console.log(e);
-    }
-  };
-
-  useEffect(() => {
-    getDataAdmin();
-    if (createUserCallBack || editUserCallBack) {
-      getDataAdmin();
-    }
-  }, [createUserCallBack, editUserCallBack]);
-
-  const onRefresh = () => {
-    setRefreshing(true);
-    getDataAdmin();
-    setTimeout(() => {
-      setRefreshing(false);
-    }, 2000);
-  };
 
   return (
     <GestureHandlerRootView>

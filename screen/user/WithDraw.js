@@ -14,29 +14,7 @@ import {
 import { Picker } from "@react-native-picker/picker";
 
 const WithDraw = ({ navigation }) => {
-  const [withDraw, setWithDraw] = useState("");
-
-  const handleWithDraw = async () => {
-    try {
-      const token = await AsyncStorage.getItem("token");
-      await axios.post(
-        `${API_URL}withdraw`,
-        {
-          debit: withDraw,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      Alert.alert("Withdraw Success");
-      navigation.navigate("MainUser");
-    } catch (e) {
-      console.log(e);
-    }
-  };
-
+  
   const textInputStyle =
     "tracking-widest border p-3 py-3 text-base border-slate-900 rounded-lg w-full";
   return (

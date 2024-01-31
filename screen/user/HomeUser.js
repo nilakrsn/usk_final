@@ -19,66 +19,7 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 import { API_URL } from "../constantAPI";
 
 const HomeUser = ({ navigation, route }) => {
-  const [data, setData] = useState([]);
-  const [roleAuth, setRoleAuth] = useState("");
-  const [name, setName] = useState("");
-  const [refresh, setRefresh] = useState(false);
-  const { username } = route.params || {};
-  const { getDataSiswaCallBack } = route.params || {};
-
-  const getData = async () => {
-    try {
-      const token = await AsyncStorage.getItem("token");
-      const role = await AsyncStorage.getItem("role");
-      const name = await AsyncStorage.getItem("name");
-      const response = await axios.get(`${API_URL}get-product-siswa`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      console.log(response.data);
-      setData(response.data);
-      setRoleAuth(role);
-      setName(name);
-    } catch (e) {
-      console.log(e);
-    }
-  };
-
-  const onRefresh = () => {
-    setRefresh(true);
-    getData();
-    setTimeout(() => {
-      setRefresh(false);
-    }, 2000);
-  };
-
-  const logout = async () => {
-    try {
-      const token = await AsyncStorage.getItem("token");
-      await axios.post(
-        `${API_URL}logout`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      await AsyncStorage.multiRemove(["token", "role"]);
-      navigation.navigate("Login");
-    } catch (e) {
-      console.log(e);
-    }
-  };
-
-  useEffect(() => {
-    getData();
-    if (getDataSiswaCallBack) {
-      getData();
-    }
-  }, [getDataSiswaCallBack]);
-
+ 
   return (
     <GestureHandlerRootView>
       <SafeAreaView className="bg-white w-full h-full">

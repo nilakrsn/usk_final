@@ -20,91 +20,10 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 import { API_URL } from "../constantAPI";
 
 const ProfilePage = ({ navigation, route }) => {
-  const [walletSelesai, setWalletSelesai] = useState([]);
-  const [walletProcess, setWalletProcess] = useState([]);
-  const [historyBeli, setHistoryBeli] = useState([]);
-  const [dataSiswa, setDataSiswa] = useState([]);
-  const { successTopUp } = route.params || {};
-  const [refresh, setRefresh] = useState(false);
+  
+  
 
-  const getDataHistory = async () => {
-    try {
-      const token = await AsyncStorage.getItem("token");
-      const response = await axios.get(`${API_URL}history`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      setWalletProcess(response.data.walletProcess);
-      setWalletSelesai(response.data.walletSelesai);
-      setHistoryBeli(response.data.transactionsBayar);
-      console.log(response.data);
-    } catch (e) {
-      console.log(e);
-    }
-  };
-
-  const getDataSiwa = async () => {
-    try {
-      const token = await AsyncStorage.getItem("token");
-      const response = await axios.get(`${API_URL}getsiswa`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      setDataSiswa(response.data);
-      console.log(response.data);
-    } catch (e) {
-      console.log(e);
-    }
-  };
-  const onRefresh = () => {
-    setRefresh(true);
-    getDataHistory();
-    getDataSiwa();
-    setTimeout(() => {
-      setRefresh(false);
-    }, 2000);
-  };
-
-  const logout = async () => {
-    try {
-      const token = await AsyncStorage.getItem("token");
-      await axios.post(
-        `${API_URL}logout`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      await AsyncStorage.multiRemove(["token", "role"]);
-      navigation.navigate("Login");
-    } catch (e) {
-      console.log(e);
-    }
-  };
-
-  const formatDate = (timestamp) => {
-    const date = new Date(timestamp);
-    const options = { year: "numeric", month: "long", day: "numeric" };
-    return date.toLocaleDateString(undefined, options);
-  };
-  const formatHour = (timestamp) => {
-    const date = new Date(timestamp);
-    const options = {
-      hour: "numeric",
-      minute: "numeric",
-      hour12: false,
-    };
-    return date.toLocaleTimeString(undefined, options);
-  };
-
-  useEffect(() => {
-    getDataHistory();
-    getDataSiwa();
-  }, []);
+  
 
   return (
     <GestureHandlerRootView>
@@ -276,3 +195,17 @@ const ProfilePage = ({ navigation, route }) => {
 };
 
 export default ProfilePage;
+const formatDate = (timestamp) => {
+  const date = new Date(timestamp);
+  const options = { year: "numeric", month: "long", day: "numeric" };
+  return date.toLocaleDateString(undefined, options);
+};
+const formatHour = (timestamp) => {
+  const date = new Date(timestamp);
+  const options = {
+    hour: "numeric",
+    minute: "numeric",
+    hour12: false,
+  };
+  return date.toLocaleTimeString(undefined, options);
+};
