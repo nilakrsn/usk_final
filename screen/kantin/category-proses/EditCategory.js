@@ -8,6 +8,33 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 import { API_URL } from "../../constantAPI";
 
 const EditCategory = ({ navigation, route }) => {
+  const [name, setName] = useState("");
+  const [id, setId] = useState(0);
+  const {pid} = route.params || {};
+  const {pname} = route.params || {};
+
+  const editCategory = async () => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+        await axios.put(`${API_URL}category-kantin-update/${id}`,{
+        name: name
+       }, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      Alert.alert("Success edit category");
+      navigation.navigate("MainCanteen", {editCategoryCallBack: name});
+    } catch (e) {
+      console.log(e);
+    }
+  };
+  
+
+  useEffect(()=>{
+    setId(pid);
+    setName(pname);
+  },[]);
   
 
   const textInputStyle =

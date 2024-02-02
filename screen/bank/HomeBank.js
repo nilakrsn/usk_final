@@ -12,7 +12,84 @@ import {
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 
 const HomeBank = ({ navigation }) => {
- 
+  const [dataBank, setDataBank] = useState([]);
+  const [refresh, setRefresh] = useState(false);
+
+  const getDataBank = async () => {
+    const token = await AsyncStorage.getItem("token");
+    try {
+      const response = await axios.get(`${API_URL}bank`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setDataBank(response.data);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const acceptTopUp = async (id) => {
+    const token = await AsyncStorage.getItem("token");
+    await axios.put(
+      `${API_URL}topup-success/${id}`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    Alert.alert("Accept success");
+    getDataBank();
+  };
+
+  const logout = async () => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      await axios.post(
+        `${API_URL}logout`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      await AsyncStorage.multiRemove(["token", "role"]);
+      navigation.navigate("Login");
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const formatDate = (timestamp) => {
+    const date = new Date(timestamp);
+    const options = { year: "numeric", month: "long", day: "numeric" };
+    return date.toLocaleDateString(undefined, options);
+  };
+
+  const formatHour = (timestamp) => {
+    const date = new Date(timestamp);
+    const options = {
+      hour: "numeric",
+      minute: "numeric",
+      hour12: false,
+    };
+    return date.toLocaleTimeString(undefined, options);
+  };
+
+  const onRefresh = () => {
+    setRefresh(true);
+    getDataBank();
+    setTimeout(() => {
+      setRefresh(false);
+    }, 2000);
+  };
+
+  useEffect(() => {
+    getDataBank();
+  }, []);
 
   return (
     <GestureHandlerRootView>

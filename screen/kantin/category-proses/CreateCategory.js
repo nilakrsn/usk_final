@@ -14,6 +14,24 @@ import axios from "axios";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { API_URL } from "../../constantAPI";
 const CreateCategory = ({ navigation }) => {
+  const [name, setName] = useState("");
+
+  const createCategory = async () => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+       await axios.post(`${API_URL}category-kantin-store`,{
+        name: name
+       }, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      Alert.alert("Success create category");
+      navigation.navigate("MainCanteen");
+    } catch (e) {
+      console.log(e);
+    }
+  };
   
 
   const textInputStyle =

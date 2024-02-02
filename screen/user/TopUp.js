@@ -7,8 +7,29 @@ import { TextInput } from "react-native";
 import axios from "axios";
 
 const TopUp = ({ navigation }) => {
-  
- 
+  const [creditTopUp, setCreditTopUp] = useState("");
+
+  const handleTopUp = async () => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      await axios.post(
+        `${API_URL}topup`,
+        {
+          credit: creditTopUp,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      Alert.alert("TopUp Success, please wait");
+      navigation.navigate("MainUser");
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
   const textInputStyle =
     "tracking-widest border p-3 py-3 text-base border-slate-900 rounded-lg w-full";
   return (
@@ -25,7 +46,7 @@ const TopUp = ({ navigation }) => {
         </View>
         <View className="py-2">
           <TouchableOpacity
-            className="bg-stone-700 p-4 rounded-lg"
+            className="bg-cyan-500 p-4 rounded-lg"
             onPress={handleTopUp}
           >
             <Text className="text-base text-white font-bold text-center">

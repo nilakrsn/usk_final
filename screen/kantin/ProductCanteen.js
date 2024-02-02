@@ -18,7 +18,53 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 import { API_URL } from "../constantAPI";
 
 const ProductCanteen = ({ navigation, route }) => {
+  const [dataProduk, setDataProduk] = useState([]);
+  const [refresh, setRefresh] = useState(false);
+  const {createProductCallBack, editProductCallBack} = route.params || {};
+
+  const getDataProduk = async () => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      const response = await axios.get(`${API_URL}kantin`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setDataProduk(response.data);
+    } catch (e) {
+      console.log(e);
+    }
+  };
   
+  const deleteProduct = async (id) =>{
+    try {
+      const token = await AsyncStorage.getItem("token");
+      await axios.delete(`${API_URL}delete-product-url/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      Alert.alert("Success delete product");
+      getDataProduk();
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  const onRefresh = () => {
+    setRefresh(true);
+    getDataProduk();
+    setTimeout(() => {
+      setRefresh(false);
+    }, 2000);
+  };
+
+  useEffect(() => {
+    getDataProduk();
+    if(createProductCallBack || editProductCallBack){
+      getDataProduk();
+    }
+  }, [createProductCallBack, editProductCallBack]);
 
   return (
     <GestureHandlerRootView>

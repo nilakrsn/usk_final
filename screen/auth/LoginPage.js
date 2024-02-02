@@ -7,7 +7,52 @@ import { TextInput } from "react-native";
 import axios from "axios";
 
 const LoginPage = ({ navigation }) => {
- 
+  const [name, setName] = useState("");
+  const [password, setPassword] = useState("");
+
+  const saveTokens = async (token, role, name) => {
+    try {
+      await AsyncStorage.setItem("token", token);
+      await AsyncStorage.setItem("role", role);
+      await AsyncStorage.setItem("name", name);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const loginUser = async () => {
+    try {
+      const response = await axios.post(`${API_URL}login`, {
+        name: name,
+        password: password,
+      });
+      console.log(response.data);
+      const token = response.data.token;
+      const role = response.data.message;
+      await saveTokens(token, role, name);
+      setName("");
+      setPassword("");
+      navigateToHome(role);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const navigateToHome = async (role) =>{
+    switch (role) {
+      case "bank":
+        navigation.navigate("MainBank");
+        break;
+      case "admin":
+        navigation.navigate("MainAdmin");
+        break;
+      case "kantin":
+        navigation.navigate("MainCanteen");
+        break;
+      default:
+        navigation.navigate("MainUser");
+    }
+  }
 
   const textInputStyle =
     "tracking-widest border p-3 py-3 text-base border-slate-900 rounded-lg w-full";

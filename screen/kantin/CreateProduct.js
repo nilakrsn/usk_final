@@ -16,7 +16,56 @@ import { API_URL } from "../constantAPI";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 
 const CreateProduct = ({ navigation }) => {
- 
+  const [nameProduct, setnameProduct] = useState("");
+  const [priceProduct, setpriceProduct] = useState("");
+  const [standProduct, setstandProduct] = useState("");
+  const [descProduct, setdescProduct] = useState("");
+  const [displayPhoto, setdisplayPhoto] = useState("");
+  const [stockProduct, setstockProduct] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState(0);
+  const [categoryProduct, setcategoryProduct] = useState([]);
+
+  const getDataCategory = async () => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      const response = await axios.get(`${API_URL}categories`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setcategoryProduct(response.data.categories);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const createProduct = async  () =>{
+    try {
+      const token = await AsyncStorage.getItem("token");
+      await axios.post(`${API_URL}create-product-url`,{
+        name: nameProduct,
+        price: priceProduct,
+        stock: stockProduct,
+        photo: displayPhoto,
+        desc: descProduct,
+        categories_id: selectedCategory,
+        stand: standProduct,
+
+      }, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      Alert.alert("Success create product");
+      navigation.navigate("MainCanteen",  {createProductCallBack: displayPhoto})
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  useEffect(() => {
+    getDataCategory();
+  }, []);
 
   const textInputStyle =
     "tracking-widest border p-3 py-3 text-base border-slate-900 rounded-lg w-full";

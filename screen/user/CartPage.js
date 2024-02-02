@@ -11,7 +11,79 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 import { API_URL } from "../constantAPI";
 
 const CartPage = ({ navigation, route }) => {
- 
+  const [data, setData] = useState([]);
+  const [refresh, setRefresh] = useState(false);
+  const { successCart } = route.params || {};
+  const currentTime = new Date();
+  const seconds = currentTime.getSeconds();
+
+  const getDataHistory = async () => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      const response = await axios.get(`${API_URL}history`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setData(response.data);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const payProduct = async () => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      await axios.put(
+        `${API_URL}pay-product`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      Alert.alert("Payment success");
+      getDataHistory();
+      navigation.navigate("MainUser", { getDataSiswaCallback: seconds });
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const cancelCart = async (id) => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      await axios.delete(
+        `${API_URL}keranjang/delete/${id}`,
+
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      Alert.alert("Cancel cart success");
+      getDataHistory();
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const onRefresh = () => {
+    setRefresh(true);
+    getDataHistory();
+    setTimeout(() => {
+      setRefresh(false);
+    }, 2000);
+  };
+
+  useEffect(() => {
+    getDataHistory();
+    if(successCart === successCart || successCart !== successCart){
+      getDataHistory();
+    }
+  }, [successCart]);
 
   return (
     <GestureHandlerRootView>
@@ -30,9 +102,7 @@ const CartPage = ({ navigation, route }) => {
             <View className="bg-cyan-500 p-4 rounded-lg flex flex-row justify-between items-center">
               <View>
                 <Text className="text-white font-bold text-lg">Total</Text>
-                <Text className="text-white text-md">
-                  Rp{data.totalPrice}
-                </Text>
+                <Text className="text-white text-md">Rp{data.totalPrice}</Text>
               </View>
               <View>
                 {data.totalPrice > data.difference ||
@@ -41,7 +111,9 @@ const CartPage = ({ navigation, route }) => {
                     className="bg-red-500 py-1 rounded-full px-2"
                     disabled
                   >
-                    <Text className="text-white font-bold text-md">Cannot Payment</Text>
+                    <Text className="text-white font-bold text-md">
+                      Cannot Payment
+                    </Text>
                   </TouchableOpacity>
                 ) : (
                   <TouchableOpacity
@@ -78,10 +150,7 @@ const CartPage = ({ navigation, route }) => {
                     </Text>
                   </View>
                 </View>
-                <TouchableOpacity
-                 
-                  onPress={() => cancelCart(item.id)}
-                >
+                <TouchableOpacity onPress={() => cancelCart(item.id)}>
                   <MaterialCommunityIcons
                     name="delete"
                     color="black"

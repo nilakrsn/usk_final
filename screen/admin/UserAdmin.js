@@ -11,6 +11,52 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 import { API_URL } from "../constantAPI";
 
 const UserAdmin = ({ navigation, route }) => {
+  const [dataUser, setDataUser] = useState([]);
+  const [refresh, setRefresh] = useState(false);
+  const { createUserCallBack, editUserCallBack } = route.params || {};
+
+  const getDataAdmin = async () => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      const response = await axios.get(`${API_URL}getsiswa`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      setDataUser(response.data);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const deleteUser = async (id) => {
+    const token = await AsyncStorage.getItem("token");
+    await axios.delete(`${API_URL}user-admin-delete/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    Alert.alert("Success delete");
+    getDataAdmin();
+  };
+
+
+
+  useEffect(() => {
+    getDataAdmin();
+    if (createUserCallBack || editUserCallBack) {
+      getDataAdmin();
+    }
+  }, [createUserCallBack, editUserCallBack]);
+
+  const onRefresh = () => {
+    setRefresh(true);
+    getDataAdmin();
+    setTimeout(() => {
+      setRefresh(false);
+    }, 2000);
+  };
  
   return (
     <GestureHandlerRootView>
@@ -40,9 +86,9 @@ const UserAdmin = ({ navigation, route }) => {
           </View>
           <View className="py-0 ">
             {dataUser.users?.map((item, index) => (
-            <View className="border-b border-slate-300">
+            <View className="border-b border-slate-300 " key={index}>
               <View
-                key={index}
+                
                 className="flex px-3 py-2 bg-white mb-2 rounded-lg"
               >
                 <View className="flex justify-between flex-row">

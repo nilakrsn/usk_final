@@ -12,15 +12,75 @@ import {
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 
 const HomeAdmin = ({ navigation, route }) => {
- 
+  const [dataAdmin, setDataAdmin] = useState([]);
+  const [refresh, setRefresh] = useState(false);
+  const { createUserCallBack, editUserCallBack } = route.params || {};
 
+  const getDataAdmin = async () => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      const response = await axios.get(`${API_URL}getsiswa`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      setDataAdmin(response.data);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const deleteUser = async (id) => {
+    const token = await AsyncStorage.getItem("token");
+    await axios.delete(`${API_URL}user-admin-delete/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    Alert.alert("Success delete");
+  };
+
+  const logout = async () => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      await axios.post(
+        `${API_URL}logout`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      await AsyncStorage.multiRemove(["token", "role"]);
+      navigation.navigate("Login");
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  useEffect(() => {
+    getDataAdmin();
+    if (createUserCallBack || editUserCallBack) {
+      getDataAdmin();
+    }
+  }, [createUserCallBack, editUserCallBack]);
+
+  const onRefresh = () => {
+    setRefresh(true);
+    getDataAdmin();
+    setTimeout(() => {
+      setRefresh(false);
+    }, 2000);
+  };
 
   return (
     <GestureHandlerRootView>
       <SafeAreaView className="bg-white w-full h-full">
         <ScrollView
           refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            <RefreshControl refreshing={refresh} onRefresh={onRefresh} />
           }
         >
           <View className=" w-full p-3 py-4 border-b border-slate-300 flex flex-row justify-between items-center bg-white ">
@@ -92,6 +152,13 @@ const HomeAdmin = ({ navigation, route }) => {
 
             <View className="flex flex-row justify-between items-center">
               <Text className="font-bold text-lg py-2">Users</Text>
+              <TouchableOpacity
+                onPress={() => navigation.navigate("CreateUser")}
+              >
+                <Text className="font-bold text-md py-2 text-cyan-500">
+                  Add new
+                </Text>
+              </TouchableOpacity>
             </View>
             {dataAdmin.users?.map((item, index) => (
               <View
@@ -116,7 +183,6 @@ const HomeAdmin = ({ navigation, route }) => {
                   <View className="flex flex-row gap-3 justify-end items-center">
                     <View>
                       <TouchableOpacity
-                        
                         onPress={() => {
                           Alert.alert(
                             "Delete",
@@ -135,25 +201,16 @@ const HomeAdmin = ({ navigation, route }) => {
                           );
                         }}
                       >
-                        <MaterialCommunityIcons
-                          name="trash-can"
-                          size={24}
-                         
-                        />
+                        <MaterialCommunityIcons name="trash-can" size={24} />
                       </TouchableOpacity>
                     </View>
                     <View>
                       <TouchableOpacity
-                        
                         onPress={() =>
                           navigation.navigate("EditUser", { id: item.id })
                         }
                       >
-                        <MaterialCommunityIcons
-                          name="pencil"
-                          size={24}
-                          
-                        />
+                        <MaterialCommunityIcons name="pencil" size={24} />
                       </TouchableOpacity>
                     </View>
                   </View>

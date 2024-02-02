@@ -11,6 +11,100 @@ import {
 } from "react-native-gesture-handler";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 const HomeCanteen = ({ navigation }) => {
+  const [data, setData] = useState([]);
+  const [refresh, setRefresh] = useState(false);
+  const [transaction, setTransaction] = useState([]);
+
+  const getDataKantin = async () => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      const response = await axios.get(`${API_URL}kantin`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setData(response.data.user);
+      setData(response.data);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+  const getTransaction = async () => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      const response = await axios.get(`${API_URL}transaction-kantin`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setTransaction(response.data.transactions);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+  const verifPengambilan = async (id) => {
+    const token = await AsyncStorage.getItem("token");
+    await axios.put(
+      `${API_URL}transaction-kantin/${id}`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    Alert.alert("Verif Success");
+    getDataKantin();
+  };
+
+  const logout = async () => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      await axios.post(
+        `${API_URL}logout`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      await AsyncStorage.multiRemove(["token", "role"]);
+      navigation.navigate("Login");
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const formatDate = (timestamp) => {
+    const date = new Date(timestamp);
+    const options = { year: "numeric", month: "long", day: "numeric" };
+    return date.toLocaleDateString(undefined, options);
+  };
+
+  const formatHour = (timestamp) => {
+    const date = new Date(timestamp);
+    const options = {
+      hour: "numeric",
+      minute: "numeric",
+      hour12: false,
+    };
+    return date.toLocaleTimeString(undefined, options);
+  };
+
+  const onRefresh = () => {
+    setRefresh(true);
+    getDataKantin();
+    getTransaction();
+    setTimeout(() => {
+      setRefresh(false);
+    }, 2000);
+  };
+
+  useEffect(() => {
+    getDataKantin();
+    getTransaction();
+  }, []);
  
 
   return (
